@@ -4,17 +4,8 @@ let x = document.createElement('div');
 // add style (text white) to x
 x.style.color = 'white';
 
-
-let t = document.createTextNode("Paragraph is created.");
-x.appendChild(t);
-
-// x.innerHTML = `
-//   <div class="ytd-live-chat-frame yt-dropdown-menu sidebar rounded-container">
-//     {user}'s Watch Party Chat
-//   </div>
-// `;
 let chatFrame = document.createElement('div');
-chatFrame.className = 'ytd-live-chat-frame yt-dropdown-menu sidebar rounded-container';
+chatFrame.className = 'sidebar';
 chatFrame.textContent = "{user}'s Watch Party Chat";
 x.appendChild(chatFrame);
 
