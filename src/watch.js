@@ -8,7 +8,7 @@ x.style.color = 'white';
 let t = document.createTextNode("Paragraph is created.");
 x.appendChild(t);
 
-x.innerHTML = "<div class = \"ytd-live-chat-frame sidebar\" rounded-container> {user}'s Watch Party Chat</div>";
+x.innerHTML = "<div class = \"ytd-live-chat-frame yt-dropdown-menu sidebar\" rounded-container> {user}'s Watch Party Chat</div>";
 
 let button = document.createElement('button');
 button.innerHTML = "Click Me";
