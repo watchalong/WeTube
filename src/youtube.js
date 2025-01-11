@@ -8,7 +8,7 @@ if (document.readyState !== "loading") {
 	});
 }
 
-function waitForElement(selector, timeout = 5000) {
+function waitForElement(selector, timeout = 10000) {
 	return new Promise((resolve, reject) => {
 		const startTime = Date.now();
 
@@ -35,31 +35,13 @@ async function init() {
 		let exploreItems = await waitForElement("#sections > :nth-child(3) > #items");
 		console.log(exploreItems);
 
-		let friendTab = document.createElement("ytd-guide-entry-renderer");
-		friendTab.className = "style-scope ytd-item-section-renderer";
+    let exploreItem1 = waitForElement("#sections > :nth-child(3) > #items > ytd-guide-entry-renderer:nth-child(1)");
 
-		let friendTabContent = document.createElement("a");
-		friendTabContent.className = "yt-simple-endpoint style-scope ytd-guide-entry-renderer";
-		friendTabContent.href = "/feed/channels";
-		friendTabContent.title = "Friends";
-		friendTabContent.setAttribute("tabindex", "-1");
-
-		let friendTabIcon = document.createElement("yt-icon");
-		friendTabIcon.className = "style-scope ytd-guide-entry-renderer";
-		friendTabIcon.setAttribute("icon", "yt-icons:account-circle");
-		friendTabIcon.setAttribute("class", "style-scope yt-icon");
-
-		let friendTabText = document.createElement("yt-formatted-string");
-		friendTabText.className = "style-scope ytd-guide-entry-renderer";
-		friendTabText.innerText = "Friends";
-
-		friendTabContent.appendChild(friendTabIcon);
-
-		friendTab.appendChild(friendTabContent);
-		friendTab.appendChild(friendTabText);
-
-		exploreItems.appendChild(friendTab);
-		console.log(exploreItems);
+    let friendTab = exploreItem1.cloneNode(true);
+    friendTab.querySelector("a").href = "/feed/channels";
+    friendTab.querySelector("a").title = "Friends";
+    friendTab.querySelector("yt-formatted-string").textContent = "Friends";
+    exploreItems.appendChild(friendTab);
 	} catch (error) {
 		console.error("Error: ", error);
 	}
