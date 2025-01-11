@@ -8,7 +8,7 @@ x.style.color = 'white';
 let t = document.createTextNode("Paragraph is created.");
 x.appendChild(t);
 
-x.innerHTML = "<div class = \"sidebar\"> Hello, world! </div>";
+x.innerHTML = "<div class = \"ytd-live-chat-frame sidebar\" rounded-container> {user}'s Watch Party Chat</div>";
 
 let button = document.createElement('button');
 button.innerHTML = "Click Me";
@@ -20,4 +20,4 @@ function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-sleep(5000).then(() => { document.querySelector("#player-container-inner").querySelector("#player-container").appendChild(x); });
+sleep(5000).then(() => { document.querySelector("#secondary-inner").insertBefore(x,document.querySelector("#chat-container")); });
