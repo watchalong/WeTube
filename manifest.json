@@ -1,0 +1,18 @@
+{
+	"manifest_version": 3,
+	"name": "WeTube",
+	"version": "0.0.1",
+	"description": "Chrome extension that adds social features to YouTube",
+	"permissions": [],
+	"host_permissions": ["https://www.youtube.com/*"],
+	"content_scripts": [
+		{
+			"matches": ["https://www.youtube.com/*"],
+			"js": ["src/template.js"]
+		}
+	],
+	"action": {
+		"default_popup": "src/popup.html",
+		"default_title": "WeTube"
+	}
+}
