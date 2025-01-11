@@ -38,12 +38,13 @@ async function init() {
 		let exploreItems = await waitForElement("#sections > :nth-child(3) > #items");
 		console.log(exploreItems);
 
-    let exploreItem1 = waitForElement("#sections > :nth-child(3) > #items > ytd-guide-entry-renderer:nth-child(1)");
+    let exploreItem1 = await waitForElement("#sections > :nth-child(3) > #items > ytd-guide-entry-renderer:nth-child(1)");
 
     let friendTab = exploreItem1.cloneNode(true);
     friendTab.querySelector("a").href = "/feed/channels";
     friendTab.querySelector("a").title = "Friends";
-    friendTab.querySelector("yt-formatted-string").textContent = "Friends";
+    // friendTab.querySelector("yt-formatted-string").textContent = "Friends";
+    // console.log(friendTab.querySelector("yt-formatted-string").textContent)
     exploreItems.appendChild(friendTab);
 	} catch (error) {
 		console.error("Error: ", error);
