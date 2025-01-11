@@ -10,7 +10,6 @@
 	}
 }
 
-
 function waitForElement(selector, timeout = 10000) {
 	return new Promise((resolve, reject) => {
 		const startTime = Date.now();
@@ -38,13 +37,15 @@ async function init() {
 		let exploreItems = await waitForElement("#sections > :nth-child(3) > #items");
 		console.log(exploreItems);
 
-    let exploreItem1 = waitForElement("#sections > :nth-child(3) > #items > ytd-guide-entry-renderer:nth-child(1)");
+		let firstItem = await waitForElement("#sections > :nth-child(3) > #items > ytd-guide-entry-renderer:nth-child(1)");
+		let friendTab = firstItem.cloneNode(true);
+		friendTab.querySelector("a").href = "/friends";
+		friendTab.querySelector("a").title = "Friends";
+		friendTab.querySelector("yt-formatted-string").textContent = "Friends";
+		exploreItems.appendChild(friendTab);
 
-    let friendTab = exploreItem1.cloneNode(true);
-    friendTab.querySelector("a").href = "/feed/channels";
-    friendTab.querySelector("a").title = "Friends";
-    friendTab.querySelector("yt-formatted-string").textContent = "Friends";
-    exploreItems.appendChild(friendTab);
+		friendTab.querySelector("yt-formatted-string").removeAttribute("is-empty");
+		friendTab.querySelector("yt-formatted-string").innerHTML = "Friends";
 	} catch (error) {
 		console.error("Error: ", error);
 	}
