@@ -20,4 +20,4 @@ function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-sleep(2000).then(() => { document.querySelector("#player-container-inner").querySelector("#player-container").appendChild(x); });
+sleep(5000).then(() => { document.querySelector("#player-container-inner").querySelector("#player-container").appendChild(x); });

@@ -1,14 +1,17 @@
-if (document.readyState !== "loading") {
-	console.log("document is already ready");
-	init();
-} else {
-	document.addEventListener("DOMContentLoaded", function () {
-		console.log("document was not ready");
+{
+	if (document.readyState !== "loading") {
+		console.log("document is already ready");
 		init();
-	});
+	} else {
+		document.addEventListener("DOMContentLoaded", function () {
+			console.log("document was not ready");
+			init();
+		});
+	}
 }
 
-function waitForElement(selector, timeout = 5000) {
+
+function waitForElement(selector, timeout = 10000) {
 	return new Promise((resolve, reject) => {
 		const startTime = Date.now();
 
