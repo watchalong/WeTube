@@ -10,5 +10,9 @@
 			"matches": ["https://www.youtube.com/*"],
 			"js": ["src/youtube.js"]
 		}
+		{
+			"matches": ["https://www.youtube.com/watch*"],
+			"js": ["src/watch.js"]
+		}
 	]
 }
