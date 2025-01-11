@@ -10,9 +10,5 @@
 			"matches": ["https://www.youtube.com/*"],
 			"js": ["src/youtube.js"]
 		}
-	],
-	"action": {
-		"default_popup": "src/popup.html",
-		"default_title": "WeTube"
-	}
+	]
 }
