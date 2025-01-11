@@ -8,7 +8,7 @@
 	"content_scripts": [
 		{
 			"matches": ["https://www.youtube.com/*"],
-			"js": ["src/template.js"]
+			"js": ["src/youtube.js"]
 		}
 	],
 	"action": {
