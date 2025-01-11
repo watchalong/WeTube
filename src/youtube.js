@@ -39,7 +39,7 @@ async function init() {
 
 		let firstItem = await waitForElement("#sections > :nth-child(3) > #items > ytd-guide-entry-renderer:nth-child(1)");
 		let friendTab = firstItem.cloneNode(true);
-		friendTab.querySelector("a").href = "/friends";
+		friendTab.querySelector("a").href = "/feed/friends";
 		friendTab.querySelector("a").title = "Friends";
 		friendTab.querySelector("yt-formatted-string").textContent = "Friends";
 		exploreItems.appendChild(friendTab);
