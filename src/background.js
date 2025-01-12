@@ -9,7 +9,7 @@ import {
 } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
 
 const firebaseConfig = {
-	apiKey: "AIzaSyCOi5de8KDLAbOGQZsLHI06QIIYfFTyoLo", // FIXME: .env
+	apiKey: "AIzaSyCOi5de8KDLAbOGQZsLHI06QIIYfFTyoLo",
 	authDomain: "wetube-1edf0.firebaseapp.com",
 	projectId: "wetube-1edf0",
 	storageBucket: "wetube-1edf0.firebasestorage.app",
@@ -20,15 +20,24 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-async function getUser(userId) {
+async function refToSnap(ref) {
 	try {
-		const docRef = doc(db, "users", userId);
-		const docSnap = await getDoc(docRef);
-		if (docSnap.exists) {
-			return docSnap.data();
+		const snap = await getDoc(ref);
+		if (snap.exists()) {
+			return snap;
 		} else {
 			return null;
 		}
+	} catch (error) {
+		console.error("Error getting document:", error);
+		return null;
+	}
+}
+
+async function getUser(userId) {
+	try {
+		const docRef = doc(db, "users", userId);
+		return refToSnap(docRef)?.data();
 	} catch (error) {
 		console.error("Error getting user:", error);
 		return null;
@@ -38,12 +47,7 @@ async function getUser(userId) {
 async function getVideo(videoId) {
 	try {
 		const docRef = doc(db, "videos", videoId);
-		const docSnap = await getDoc(docRef);
-		if (docSnap.exists) {
-			return docSnap.data();
-		} else {
-			return null;
-		}
+		return refToSnap(docRef)?.data();
 	} catch (error) {
 		console.error("Error getting user:", error);
 		return null;
@@ -53,12 +57,7 @@ async function getVideo(videoId) {
 async function getParty(partyId) {
 	try {
 		const docRef = doc(db, "parties", partyId);
-		const docSnap = await getDoc(docRef);
-		if (docSnap.exists) {
-			return docSnap.data();
-		} else {
-			return null;
-		}
+		return refToSnap(docRef)?.data();
 	} catch (error) {
 		console.error("Error getting user:", error);
 		return null;
