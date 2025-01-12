@@ -38,7 +38,6 @@ chrome.runtime
           action: "setUser",
           payload: [username, {
             video: currentVideo,
-            party: "",
             friends: [],
           }]
         });
@@ -55,7 +54,7 @@ chrome.runtime
             chrome.runtime
               .sendMessage({
                 action: "setVideo",
-                payload: [currentVideo, { users: [username] }],
+                payload: [currentVideo, { users: [username], messages: [] }],
               });
           } else {
             let users = response.data.users || [];
@@ -86,7 +85,7 @@ chrome.runtime
             chrome.runtime
               .sendMessage({
                 action: "setVideo",
-                payload: [currentVideo, { users: [username] }],
+                payload: [currentVideo, { users: [username], messages: [] }],
               });
           } else {
             let users = response.data.users || [];
@@ -147,7 +146,7 @@ setInterval(() => {
           chrome.runtime
             .sendMessage({
               action: "setVideo",
-              payload: [currentVideo, { users: [username] }],
+              payload: [currentVideo, { users: [username], messages: []}],
             });
         } else {
           let users = response.data.users || [];
@@ -210,13 +209,13 @@ let observer = new MutationObserver(() => {
 });
 
 observer.observe(chatMessagesWrapper, { childList: true });
-function sendMessage(party, content) {
-  console.log(`${party}: ${username}: ${content}`);
+function sendMessage(content) {
+  console.log(`${currentVideo}: ${username}: ${content}`);
 
   chrome.runtime
     .sendMessage({
-      action: "getParty",
-      payload: [party],
+      action: "getVideo",
+      payload: [currentVideo],
     })
     .then((response) => {
       let messages = response.data.messages || [];
@@ -224,8 +223,8 @@ function sendMessage(party, content) {
 
       chrome.runtime
         .sendMessage({
-          action: "setParty",
-          payload: [party, { messages: messages }],
+          action: "setVideo",
+          payload: [currentVideo, { messages: messages }],
         });
     });
 }
@@ -233,10 +232,10 @@ chatInput.onsubmit = function (e) {
   e.preventDefault(); // prevent form submission (no page refresh)
   if (chatTextBox.value !== "") {
     // prevent empty messages
-    sendMessage("testParty1", chatTextBox.value);
+    sendMessage(chatTextBox.value);
     chatTextBox.value = "";
     setTimeout(() => {
-        chatMessagesWrapper.scrollTop = chatMessagesWrapper.scrollHeight;
+      chatMessagesWrapper.scrollTop = chatMessagesWrapper.scrollHeight;
     }, 500);
   }
 };
@@ -249,50 +248,50 @@ initPartyChat();
 let previousMessages = [];
 
 function updateMessages() {
-    chrome.runtime
-        .sendMessage({
-            action: "getParty",
-            payload: ["testParty1"],
-        })
-        .then((response) => {
-            let newMessages = response.data.messages || [];
-            if (JSON.stringify(newMessages) !== JSON.stringify(previousMessages)) {
-                let wasScrolledToBottom =
-                    chatMessagesWrapper.scrollHeight - chatMessagesWrapper.scrollTop ===
-                    chatMessagesWrapper.clientHeight;
+  chrome.runtime
+    .sendMessage({
+      action: "getVideo",
+      payload: [currentVideo],
+    })
+    .then((response) => {
+      let newMessages = response.data.messages || [];
+      if (JSON.stringify(newMessages) !== JSON.stringify(previousMessages)) {
+        let wasScrolledToBottom =
+          chatMessagesWrapper.scrollHeight - chatMessagesWrapper.scrollTop ===
+          chatMessagesWrapper.clientHeight;
 
-                chatMessagesWrapper.innerHTML = "";
-                newMessages.forEach((message) => {
-                    let messageElement = document.createElement("div");
-                    messageElement.className = "message";
+        chatMessagesWrapper.innerHTML = "";
+        newMessages.forEach((message) => {
+          let messageElement = document.createElement("div");
+          messageElement.className = "message";
 
-                    let firstSpaceIndex = message.indexOf(",");
-                    if (firstSpaceIndex !== -1) {
-                        let firstWord = message.substring(0, firstSpaceIndex);
-                        let restOfMessage = message.substring(firstSpaceIndex + 1);
+          let firstSpaceIndex = message.indexOf(",");
+          if (firstSpaceIndex !== -1) {
+            let firstWord = message.substring(0, firstSpaceIndex);
+            let restOfMessage = message.substring(firstSpaceIndex + 1);
 
-                        messageElement.innerHTML = `<strong style = "margin-right: 5px">${firstWord}</strong> ${restOfMessage}`;
-                    } else {
-                        messageElement.textContent = message;
-                    }
-                    chatMessagesWrapper.appendChild(messageElement);
-                });
-
-                if (wasScrolledToBottom) {
-                    chatMessagesWrapper.scrollTop = chatMessagesWrapper.scrollHeight;
-                }
-
-                previousMessages = newMessages;
-            }
+            messageElement.innerHTML = `<strong style = "margin-right: 5px">${firstWord}</strong> ${restOfMessage}`;
+          } else {
+            messageElement.textContent = message;
+          }
+          chatMessagesWrapper.appendChild(messageElement);
         });
+
+        if (wasScrolledToBottom) {
+          chatMessagesWrapper.scrollTop = chatMessagesWrapper.scrollHeight;
+        }
+
+        previousMessages = newMessages;
+      }
+    });
 }
 
 setInterval(updateMessages, 1000);
 setInterval(() => {
   chrome.runtime
     .sendMessage({
-      action: "getParty",
-      payload: ["testParty1"],
+      action: "getVideo",
+      payload: [currentVideo],
     })
     .then((response) => {
       //   chatMessagesWrapper.scrollTop = chatMessagesWrapper.scrollHeight;

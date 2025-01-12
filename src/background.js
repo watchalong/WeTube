@@ -70,35 +70,19 @@ async function deleteDocument(collectionName, docId) {
 const databaseFunctions = {
   getUser: (userId) => fetchDocument("users", userId),
   getVideo: (videoId) => fetchDocument("videos", videoId),
-  getParty: (partyId) => fetchDocument("parties", partyId),
+  // getParty: (partyId) => fetchDocument("parties", partyId),
 
   setUser: (userId, data) => setDocument("users", userId, data),
   setVideo: (videoId, data) => setDocument("videos", videoId, data),
-  setParty: (partyId, data) => setDocument("parties", partyId, data),
+  // setParty: (partyId, data) => setDocument("parties", partyId, data),
 
   addUser: (data) => addDocument("users", data),
   addVideo: (data) => addDocument("videos", data),
-  addParty: (data) => addDocument("parties", data),
-
-  // addMessage: async (partyId, data) => {
-	// 	console.log("in addMessage");
-  //   try {
-  //     const partyRef = doc(db, "parties", partyId);
-	// 		console.log(partyRef)
-  //     await updateDoc(partyRef, {
-  //       messages: arrayUnion(data),
-  //     });
-	// 		console.log("successfully added message to party");
-  //     return { success: true };
-  //   } catch (error) {
-  //     console.error(`Error adding message ${data} to ${partyId}:`, error);
-  //     throw new Error(`Failed to add message to ${partyId}`);
-  //   }
-  // },
+  // addParty: (data) => addDocument("parties", data),
 
   deleteUser: (userId) => deleteDocument("users", userId),
   deleteVideo: (videoId) => deleteDocument("videos", videoId),
-  deleteParty: (partyId) => deleteDocument("parties", partyId),
+  // deleteParty: (partyId) => deleteDocument("parties", partyId),
 };
 
 async function handleRequest(action, payload) {
