@@ -33,11 +33,30 @@ let chatSubmitButton = document.createElement('input');
 chatSubmitButton.type = 'submit';
 chatInput.appendChild(chatSubmitButton);
 
-chatInput.onsubmit = function(e) {
-    
-    e.preventDefault();
-    alert(chatTextBox.value);
-    chatTextBox.value = '';
+function sendMessage(party, user, content) {
+  // send message to firestore
+  // add a string "{user} {content}" to the messages array field of the party
+  console.log(`${party}: ${user}: ${content}`);
+
+  chrome.runtime.sendMessage({
+    action: "addData", payload: {
+      doc: `parties/${party}`,
+      field: "messages",
+      type: "append",
+      content: user + " " + content
+    }
+  }, (response) => {
+    response.success ?
+      console.log("Data added successfully!") :
+      console.log("Data not added successfully!");
+  });
+}
+
+chatInput.onsubmit = function (e) {
+  e.preventDefault();
+  // alert(chatTextBox.value);
+  sendMessage("testParty1", "testUser1", chatTextBox.value);
+  chatTextBox.value = '';
 }
 
 chatFrame.appendChild(chatInput);
@@ -46,10 +65,10 @@ chatFrame.appendChild(chatInput);
 initPartyChat();
 
 async function initPartyChat() {
-    let ytSecondarySection  = await waitForElement("#secondary-inner");
+  let ytSecondarySection = await waitForElement("#secondary-inner");
 
-    let ytChatContainer = await waitForElement("#chat-container");
+  let ytChatContainer = await waitForElement("#chat-container");
 
-    ytSecondarySection.insertBefore(partyChatContainer, ytChatContainer);
+  ytSecondarySection.insertBefore(partyChatContainer, ytChatContainer);
 }
 // sleep(5000).then(() => { document.querySelector("#secondary-inner").insertBefore(x,document.querySelector("#chat-container")); });
