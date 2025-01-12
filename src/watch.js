@@ -34,6 +34,20 @@ function updateViewersCount() {
   chatOnlineViewersCount.innerHTML = `<span style="color: green; font-size: 30px; margin:0; vertical-align: middle;">•</span> ${numViewers}` + (numViewers === 1 ? " viewer" : " viewers");
 }
 
+var videoElement = document.querySelector('video');
+videoElement.addEventListener('pause', function() {
+  console.log('Video has been paused');
+  console.log("videoElement.currentTime")
+  // Add your custom pause handling code here
+});
+
+videoElement.addEventListener('play', function() {
+    console.log('Video has been played');
+    // Add your custom pause handling code here
+    alert("Video has been played");
+    console.log("videoElement.currentTime")
+});
+
 // check if user exists in firestore
 chrome.runtime
   .sendMessage({
