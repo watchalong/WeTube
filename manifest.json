@@ -14,6 +14,10 @@
 			"matches": ["https://www.youtube.com/watch*"],
 			"css": ["styles.css"],
 			"js": ["src/watch.js"]
+		},
+		{
+			"matches": ["https://www.youtube.com/feed/friends*"],
+			"js": ["src/friends.js"]
 		}
 	],
 	"background": {

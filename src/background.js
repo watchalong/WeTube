@@ -13,13 +13,79 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
+async function getUser(userId) {
+	try {
+		const docRef = doc(db, "users", userId);
+		const docSnap = await getDoc(docRef);
+		if (docSnap.exists) {
+			return docSnap.data();
+		} else {
+			return null;
+		}
+	} catch (error) {
+		console.error("Error getting user:", error);
+		return null;
+	}
+}
+
+async function getVideo(videoId) {
+	try {
+		const docRef = doc(db, "videos", videoId);
+		const docSnap = await getDoc(docRef);
+		if (docSnap.exists) {
+			return docSnap.data();
+		} else {
+			return null;
+		}
+	} catch (error) {
+		console.error("Error getting user:", error);
+		return null;
+	}
+}
+
+async function getParty(partyId) {
+	try {
+		const docRef = doc(db, "parties", partyId);
+		const docSnap = await getDoc(docRef);
+		if (docSnap.exists) {
+			return docSnap.data();
+		} else {
+			return null;
+		}
+	} catch (error) {
+		console.error("Error getting user:", error);
+		return null;
+	}
+}
+
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-	if (request.action === "fetchData") {
-		let data = doc(db, "tc/td");
-		sendResponse({ data });
+	let command = request.action;
+
+	if (command.startsWith("get")) {
+		command = command.substr(3);
+		let fetchFunction;
+
+		if (command === "User") {
+			fetchFunction = getUser;
+		} else if (command === "Video") {
+			fetchFunction = getVideo;
+		} else if (command === "Party") {
+			fetchFunction = getParty;
+		} else {
+			sendResponse({ error: "Invalid action" });
+			return;
+		}
+
+		fetchFunction(request.payload)
+			.then((data) => {
+				sendResponse({ data });
+			})
+			.catch((error) => {
+				sendResponse({ error: error.message });
+			});
+
 		return true;
-	} else if (request.action === "addData") {
-		sendResponse({ success: true });
-		return true;
+	} else {
+		sendResponse({ error: "Unsupported action" });
 	}
 });

@@ -1,13 +1,3 @@
-chrome.runtime.sendMessage({ action: "fetchData" }, (response) => {
-	console.log("Fetched Data from Firestore:", response.data);
-});
-
-chrome.runtime.sendMessage({ action: "addData", payload: newData }, (response) => {
-	if (response.success) {
-		console.log("Data added successfully!");
-	}
-});
-
 if (document.readyState !== "loading") {
 	console.log("document is already ready");
 	init();
@@ -38,12 +28,7 @@ function waitForElement(selector, timeout = 10000) {
 async function init() {
 	console.log("\n\n\n\n\n\nWETUBE\n\n\n\n\n\n");
 	try {
-		let sections = await waitForElement("#sections");
-		console.log(sections);
-		let explore = await waitForElement("#sections > :nth-child(3)");
-		console.log(explore);
 		let exploreItems = await waitForElement("#sections > :nth-child(3) > #items");
-		console.log(exploreItems);
 
 		let firstItem = await waitForElement("#sections > :nth-child(3) > #items > ytd-guide-entry-renderer:nth-child(1)");
 		let friendTab = firstItem.cloneNode(true);
