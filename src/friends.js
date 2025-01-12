@@ -57,63 +57,94 @@ function renderVideos(videos, container) {
 	container.innerHTML = "";
 
 	for (let [videoId, users] of Object.entries(videos)) {
-		let videoCard = document.createElement("div");
-		videoCard.className = "custom-video-card";
-		videoCard.style = `
-            display: flex;
-            margin-bottom: 20px;
-            background-color: #fff;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-            border-radius: 8px;
-            overflow: hidden;
-        `;
+		chrome.runtime.sendMessage({ action: "getVideo", payload: [videoId] }).then((response) => {
+			let videoTitle = response.data?.title || "Untitled Video";
 
-		let thumbnail = document.createElement("img");
-		thumbnail.src = `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`;
-		thumbnail.style = `
-            width: 320px;
-            height: 180px;
-            object-fit: cover;
-        `;
+			let videoCard = document.createElement("div");
+			videoCard.className = "custom-video-card";
+			videoCard.style = `
+                display: flex;
+                margin-bottom: 20px;
+                background-color: #080808;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+                border-radius: 8px;
+                overflow: hidden;
+            `;
 
-		let details = document.createElement("div");
-		details.style = `
-            padding: 10px 15px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-        `;
+			let thumbnail = document.createElement("img");
+			thumbnail.src = `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`;
+			thumbnail.style = `
+                width: 320px;
+                height: 180px;
+                object-fit: cover;
+            `;
 
-		let title = document.createElement("a");
-		title.href = `/watch?v=${videoId}`;
-		title.textContent = videoId;
-		title.style = `
-            font-size: 18px;
-            font-weight: bold;
-            color: #065fd4;
-            text-decoration: none;
-            margin-bottom: 5px;
-        `;
+			let details = document.createElement("div");
+			details.style = `
+                padding: 10px 15px;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+            `;
 
-		let channelInfo = document.createElement("div");
-		let userString = "";
-		for (let user of users) {
-			console.log(user);
-			userString += user.name + ", ";
-		}
-		userString = userString.slice(0, -2) + " are watching";
-		channelInfo.textContent = userString;
+			let title = document.createElement("a");
+			title.href = `/watch?v=${videoId}`;
+			title.textContent = videoTitle;
+			title.style = `
+                font-size: 18px;
+                font-weight: bold;
+                color: #065fd4;
+                text-decoration: none;
+                margin-bottom: 10px;
+            `;
+
+			let userInfoContainer = document.createElement("div");
+			userInfoContainer.style = `
+                display: flex;
+                align-items: center;
+                flex-wrap: wrap;
+                gap: 10px;
+                margin-top: 5px;
+            `;
+
+			users.forEach((user) => {
+				let userWrapper = document.createElement("div");
+				userWrapper.style = `
+                    display: flex;
+                    align-items: center;
+                    background-color: #303030;
+                    padding: 4px 8px;
+                    border-radius: 20px;
+                `;
+
+				let userAvatar = document.createElement("img");
+				userAvatar.src = user.pfp;
+				userAvatar.style = `
+                    width: 24px;
+                    height: 24px;
+                    border-radius: 50%;
+                    margin-right: 8px;
+                `;
+
+				let userName = document.createElement("span");
+				userName.textContent = `${user.name} is watching`;
+				userName.style = `
+                    font-size: 12px;
+                    color: #999;
+                `;
+
+				userWrapper.appendChild(userAvatar);
+				userWrapper.appendChild(userName);
+				userInfoContainer.appendChild(userWrapper);
+			});
+
+			details.appendChild(title);
+			details.appendChild(userInfoContainer);
+
+			videoCard.appendChild(thumbnail);
+			videoCard.appendChild(details);
+
+			container.appendChild(videoCard);
+		});
 	}
-	channelInfo.style = `
-            font-size: 14px;
-            color: #606060;
-        `;
-
-	details.appendChild(title);
-	details.appendChild(channelInfo);
-
-	videoCard.appendChild(thumbnail);
-	videoCard.appendChild(details);
-
-	container.appendChild(videoCard);
 }
