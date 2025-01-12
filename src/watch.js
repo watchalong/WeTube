@@ -95,12 +95,15 @@ chrome.runtime
         .then((response) => {
           if (!response.data) {
             console.log("Video does not exist");
-            let title = document.querySelector("#title > h1 > yt-formatted-string").textContent;
-            chrome.runtime
-              .sendMessage({
-                action: "setVideo",
-                payload: [currentVideo, { users: [username], messages: [], title: title }],
-              });
+            waitForElement("#title > h1 > yt-formatted-string").then((element) => {
+              let title = element.textContent;
+              console.log(title);
+              chrome.runtime
+                .sendMessage({
+                  action: "setVideo",
+                  payload: [currentVideo, { users: [username], messages: [], title: title }],
+                });
+            });
           } else {
             let users = response.data.users || [];
             users.push(username);
