@@ -101,19 +101,19 @@ function renderVideos(videos, container) {
 			console.log(user);
 			userString += user.name + ", ";
 		}
-		userString = userString.slice(0, -2);
-		channelInfo.textContent = `Shared by: ${userString}`;
-		channelInfo.style = `
+		userString = userString.slice(0, -2) + " are watching";
+		channelInfo.textContent = userString;
+	}
+	channelInfo.style = `
             font-size: 14px;
             color: #606060;
         `;
 
-		details.appendChild(title);
-		details.appendChild(channelInfo);
+	details.appendChild(title);
+	details.appendChild(channelInfo);
 
-		videoCard.appendChild(thumbnail);
-		videoCard.appendChild(details);
+	videoCard.appendChild(thumbnail);
+	videoCard.appendChild(details);
 
-		container.appendChild(videoCard);
-	}
+	container.appendChild(videoCard);
 }
