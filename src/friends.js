@@ -30,7 +30,7 @@ offlineList.style.fontSize = "20px";
 
 chrome.runtime.sendMessage({
   action: "getUser",
-  payload: "testUser1",
+  payload: ["testUser1"],
 }).then(response => {
   console.log(response);
   let friends = response.data.friends;
