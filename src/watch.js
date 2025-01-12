@@ -12,6 +12,156 @@ for (let script of document.scripts) {
   }
 }
 
+function getVideoID() {
+  let url = window.location.href;
+  let videoID = url.split("v=")[1];
+  let ampersandPosition = videoID.indexOf("&");
+  if (ampersandPosition != -1) {
+    videoID = videoID.substring(0, ampersandPosition);
+  }
+  return videoID;
+}
+
+let currentVideo = getVideoID();
+
+// check if user exists in firestore
+chrome.runtime
+  .sendMessage({
+    action: "getUser",
+    payload: [username],
+  })
+  .then((response) => {
+    if (!response.data) {
+      console.log("User does not exist");
+      chrome.runtime
+        .sendMessage({
+          action: "setUser",
+          payload: [username, {
+            video: currentVideo,
+            party: "",
+            friends: [],
+          }]
+        });
+
+      // update video's users
+      chrome.runtime
+        .sendMessage({
+          action: "getVideo",
+          payload: [currentVideo],
+        })
+        .then((response) => {
+          if (!response.data) {
+            console.log("Video does not exist");
+            chrome.runtime
+              .sendMessage({
+                action: "setVideo",
+                payload: [currentVideo, { users: [username] }],
+              });
+          } else {
+            let users = response.data.users || [];
+            users.push(username);
+
+            chrome.runtime
+              .sendMessage({
+                action: "setVideo",
+                payload: [currentVideo, { users: users }],
+              });
+          }
+        });
+    } else {
+      chrome.runtime
+        .sendMessage({
+          action: "setUser",
+          payload: [username, { video: currentVideo }],
+        });
+
+      chrome.runtime
+        .sendMessage({
+          action: "getVideo",
+          payload: [currentVideo],
+        })
+        .then((response) => {
+          if (!response.data) {
+            console.log("Video does not exist");
+            chrome.runtime
+              .sendMessage({
+                action: "setVideo",
+                payload: [currentVideo, { users: [username] }],
+              });
+          } else {
+            let users = response.data.users || [];
+            users.push(username);
+
+            chrome.runtime
+              .sendMessage({
+                action: "setVideo",
+                payload: [currentVideo, { users: users }],
+              });
+          }
+        });
+    }
+  });
+
+
+setInterval(() => {
+  let prevVideo = currentVideo;
+  currentVideo = getVideoID();
+
+  console.log(prevVideo, currentVideo);
+
+  if (prevVideo !== currentVideo) {
+    chrome.runtime
+      .sendMessage({
+        action: "setUser",
+        payload: [username, { video: currentVideo }],
+      });
+
+    // remove user from previous video
+    chrome.runtime
+      .sendMessage({
+        action: "getVideo",
+        payload: [prevVideo],
+      })
+      .then((response) => {
+        console.log(response);
+        let users = response.data.users || [];
+        console.log(users);
+        users = users.filter((user) => user !== username);
+
+        chrome.runtime
+          .sendMessage({
+            action: "setVideo",
+            payload: [prevVideo, { users: users }],
+          })
+      });
+
+    // get video's users
+    chrome.runtime
+      .sendMessage({
+        action: "getVideo",
+        payload: [currentVideo],
+      })
+      .then((response) => {
+        if (!response.data) {
+          console.log("Video does not exist");
+          chrome.runtime
+            .sendMessage({
+              action: "setVideo",
+              payload: [currentVideo, { users: [username] }],
+            });
+        } else {
+          let users = response.data.users || [];
+          users.push(username);
+
+          chrome.runtime
+            .sendMessage({
+              action: "setVideo",
+              payload: [currentVideo, { users: users }],
+            });
+        }
+      });
+  }
+}, 1000);
 
 let partyChatContainer = document.createElement("div");
 
@@ -69,7 +219,6 @@ function sendMessage(party, content) {
       payload: [party],
     })
     .then((response) => {
-      console.log(response);
       let messages = response.data.messages || [];
       messages.push(`${username},${content}`);  // comma-separated
 
@@ -77,9 +226,6 @@ function sendMessage(party, content) {
         .sendMessage({
           action: "setParty",
           payload: [party, { messages: messages }],
-        })
-        .then((response) => {
-          console.log(response);
         });
     });
 }
@@ -105,7 +251,7 @@ setInterval(() => {
     })
     .then((response) => {
       //   chatMessagesWrapper.scrollTop = chatMessagesWrapper.scrollHeight;
-      console.log(response);
+      // console.log(response);
       chatMessagesWrapper.innerHTML = "";
       response.data.messages.forEach((message) => {
         let messageElement = document.createElement("div");
