@@ -1,5 +1,14 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
-import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
+import {
+	getFirestore,
+	doc,
+	getDoc,
+	setDoc,
+	updateDoc,
+	deleteDoc,
+	collection,
+	addDoc,
+} from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
 
 export const firebaseConfig = {
 	apiKey: "AIzaSyCOi5de8KDLAbOGQZsLHI06QIIYfFTyoLo",
@@ -24,16 +33,61 @@ async function fetchDocument(collectionName, docId) {
 	}
 }
 
+async function setDocument(collectionName, docId, data) {
+	try {
+		const docRef = doc(db, collectionName, docId);
+		await setDoc(docRef, data, { merge: true });
+		return { success: true };
+	} catch (error) {
+		console.error(`Error setting ${collectionName}/${docId}:`, error);
+		throw new Error(`Failed to set ${collectionName}`);
+	}
+}
+
+async function appendDocument(collectionName, data) {
+	try {
+		const collRef = collection(db, collectionName);
+		const docRef = await addDoc(collRef, data);
+		return { success: true, id: docRef.id };
+	} catch (error) {
+		console.error(`Error appending to ${collectionName}:`, error);
+		throw new Error(`Failed to append to ${collectionName}`);
+	}
+}
+
+async function deleteDocument(collectionName, docId) {
+	try {
+		const docRef = doc(db, collectionName, docId);
+		await deleteDoc(docRef);
+		return { success: true };
+	} catch (error) {
+		console.error(`Error deleting ${collectionName}/${docId}:`, error);
+		throw new Error(`Failed to delete ${collectionName}`);
+	}
+}
+
 const databaseFunctions = {
 	getUser: (userId) => fetchDocument("users", userId),
 	getVideo: (videoId) => fetchDocument("videos", videoId),
 	getParty: (partyId) => fetchDocument("parties", partyId),
+
+	setUser: (userId, data) => setDocument("users", userId, data),
+	setVideo: (videoId, data) => setDocument("videos", videoId, data),
+	setParty: (partyId, data) => setDocument("parties", partyId, data),
+
+	appendUser: (data) => appendDocument("users", data),
+	appendVideo: (data) => appendDocument("videos", data),
+	appendParty: (data) => appendDocument("parties", data),
+
+	deleteUser: (userId) => deleteDocument("users", userId),
+	deleteVideo: (videoId) => deleteDocument("videos", videoId),
+	deleteParty: (partyId) => deleteDocument("parties", partyId),
 };
 
 async function handleRequest(action, payload) {
 	const fetchFunction = databaseFunctions[action];
 	if (!fetchFunction) throw new Error("Invalid action");
-	let response = await fetchFunction(payload);
+	let response = await fetchFunction(...payload);
 	return response;
 }
 
