@@ -61,10 +61,11 @@ chrome.runtime
         .then((response) => {
           if (!response.data) {
             console.log("Video does not exist");
+            let title = document.querySelector("#title > h1 > yt-formatted-string").textContent;
             chrome.runtime
               .sendMessage({
                 action: "setVideo",
-                payload: [currentVideo, { users: [username], messages: [] }],
+                payload: [currentVideo, { users: [username], messages: [], title: title }],
               });
           } else {
             let users = response.data.users || [];
@@ -94,10 +95,11 @@ chrome.runtime
         .then((response) => {
           if (!response.data) {
             console.log("Video does not exist");
+            let title = document.querySelector("#title > h1 > yt-formatted-string").textContent;
             chrome.runtime
               .sendMessage({
                 action: "setVideo",
-                payload: [currentVideo, { users: [username], messages: [] }],
+                payload: [currentVideo, { users: [username], messages: [], title: title }],
               });
           } else {
             let users = response.data.users || [];
@@ -159,10 +161,11 @@ setInterval(() => {
       .then((response) => {
         if (!response.data) {
           console.log("Video does not exist");
+          let title = document.querySelector("#title > h1 > yt-formatted-string").textContent;
           chrome.runtime
             .sendMessage({
               action: "setVideo",
-              payload: [currentVideo, { users: [username], messages: [] }],
+              payload: [currentVideo, { users: [username], messages: [], title: title }],
             });
         } else {
           let users = response.data.users || [];
