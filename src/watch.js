@@ -25,6 +25,16 @@ function getVideoID() {
 let currentVideo = getVideoID();
 let numViewers = 1;
 
+chatOnlineViewersCount = document.createElement("div");
+chatOnlineViewersCount.innerHTML = `<span style="color: green; font-size: 30px; margin:0; vertical-align: middle;">•</span> ${numViewers} viewer`;
+chatOnlineViewersCount.className = "viewers-count";
+chatTitleWrapper.style.alignItems = "center";
+chatOnlineViewersCount.style.marginLeft = "auto";
+
+function updateViewersCount() {
+  chatOnlineViewersCount.innerHTML = `<span style="color: green; font-size: 30px; margin:0; vertical-align: middle;">•</span> ${numViewers}` + (numViewers === 1 ? " viewer" : " viewers");
+}
+
 // check if user exists in firestore
 chrome.runtime
   .sendMessage({
@@ -104,6 +114,8 @@ chrome.runtime
           }
         });
     }
+
+    updateViewersCount();
   });
 
 
@@ -151,7 +163,7 @@ setInterval(() => {
           chrome.runtime
             .sendMessage({
               action: "setVideo",
-              payload: [currentVideo, { users: [username], messages: []}],
+              payload: [currentVideo, { users: [username], messages: [] }],
             });
         } else {
           let users = response.data.users || [];
@@ -167,6 +179,8 @@ setInterval(() => {
         }
       });
   }
+
+  updateViewersCount();
 }, 1000);
 
 let partyChatContainer = document.createElement("div");
@@ -185,11 +199,6 @@ chatTitleWrapper.style = "box-shadow: none; border-radius: 10px 10px 0 0; paddin
 chatTitleWrapper.style.display = "flex";
 chatTitleWrapper.style.alignItems = "center";
 chatTitleWrapper.style.justifyContent = "space-between";
-chatOnlineViewersCount = document.createElement("div");
-chatOnlineViewersCount.innerHTML = `<span style="color: green; font-size: 30px; margin:0; vertical-align: middle;">•</span> ${numViewers} viewers`;
-chatOnlineViewersCount.className = "viewers-count";
-chatTitleWrapper.style.alignItems = "center";
-chatOnlineViewersCount.style.marginLeft = "auto";
 
 chatTitleWrapper.appendChild(chatOnlineViewersCount);
 
