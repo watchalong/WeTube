@@ -1,16 +1,17 @@
 .sidebar {
   color: #f1f1f1;
   width: 400-18px;
-  height: 600px;
+  height: fit-content;
   background-color: #0F0F0F;
   left: 0;
   top: 0;
   border-radius: 10px;
-  padding: 8px;
   margin-bottom: 30px;
   font-size: 16px;
   text-align: center;
-  border: #3F3F3F 1px solid;
+  border: rgb(63, 63, 63) 1px solid;
   font-family: Roboto, Arial, sans-serif;
   font-weight: normal;
+  /* box-shadow: #3F3F3F 0px 10px 50px; */
+  box-shadow: 0px 0px 50px 2px rgba(63, 63, 63, 0.35), 0px 0px 10px 2px rgba(63, 63, 63, 0.35);
 }
