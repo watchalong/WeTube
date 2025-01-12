@@ -1,3 +1,188 @@
+// loop through all nonce scripts and find the one that contains the user's name
+let username = "";
+for (let script of document.scripts) {
+  // console.log(script);
+  if (script.nonce) {
+    let matches = script.innerHTML.match(/"USER_ACCOUNT_NAME":"(.*?)"/);
+    if (matches) {
+      username = matches[1];
+      console.log(username);
+      break;
+    }
+  }
+}
+
+function getVideoID() {
+  let url = window.location.href;
+  let videoID = url.split("v=")[1];
+  let ampersandPosition = videoID.indexOf("&");
+  if (ampersandPosition != -1) {
+    videoID = videoID.substring(0, ampersandPosition);
+  }
+  return videoID;
+}
+
+let currentVideo = getVideoID();
+let numViewers = 1;
+
+chatOnlineViewersCount = document.createElement("div");
+chatOnlineViewersCount.innerHTML = `<span style="color: green; font-size: 30px; margin:0; vertical-align: middle;">•</span> ${numViewers} viewer`;
+chatOnlineViewersCount.className = "viewers-count";
+chatTitleWrapper.style.alignItems = "center";
+chatOnlineViewersCount.style.marginLeft = "auto";
+
+function updateViewersCount() {
+  chatOnlineViewersCount.innerHTML = `<span style="color: green; font-size: 30px; margin:0; vertical-align: middle;">•</span> ${numViewers}` + (numViewers === 1 ? " viewer" : " viewers");
+}
+
+// check if user exists in firestore
+chrome.runtime
+  .sendMessage({
+    action: "getUser",
+    payload: [username],
+  })
+  .then((response) => {
+    if (!response.data) {
+      console.log("User does not exist");
+      chrome.runtime
+        .sendMessage({
+          action: "setUser",
+          payload: [username, {
+            video: currentVideo,
+            friends: [],
+          }]
+        });
+
+      // update video's users
+      chrome.runtime
+        .sendMessage({
+          action: "getVideo",
+          payload: [currentVideo],
+        })
+        .then((response) => {
+          if (!response.data) {
+            console.log("Video does not exist");
+            chrome.runtime
+              .sendMessage({
+                action: "setVideo",
+                payload: [currentVideo, { users: [username], messages: [] }],
+              });
+          } else {
+            let users = response.data.users || [];
+            users.push(username);
+
+            numViewers = users.length;
+
+            chrome.runtime
+              .sendMessage({
+                action: "setVideo",
+                payload: [currentVideo, { users: users }],
+              });
+          }
+        });
+    } else {
+      chrome.runtime
+        .sendMessage({
+          action: "setUser",
+          payload: [username, { video: currentVideo }],
+        });
+
+      chrome.runtime
+        .sendMessage({
+          action: "getVideo",
+          payload: [currentVideo],
+        })
+        .then((response) => {
+          if (!response.data) {
+            console.log("Video does not exist");
+            chrome.runtime
+              .sendMessage({
+                action: "setVideo",
+                payload: [currentVideo, { users: [username], messages: [] }],
+              });
+          } else {
+            let users = response.data.users || [];
+            users.push(username);
+
+            numViewers = users.length;
+
+            chrome.runtime
+              .sendMessage({
+                action: "setVideo",
+                payload: [currentVideo, { users: users }],
+              });
+          }
+        });
+    }
+
+    updateViewersCount();
+  });
+
+
+setInterval(() => {
+  let prevVideo = currentVideo;
+  currentVideo = getVideoID();
+
+  console.log(prevVideo, currentVideo);
+
+  if (prevVideo !== currentVideo) {
+    chrome.runtime
+      .sendMessage({
+        action: "setUser",
+        payload: [username, { video: currentVideo }],
+      });
+
+    // remove user from previous video
+    chrome.runtime
+      .sendMessage({
+        action: "getVideo",
+        payload: [prevVideo],
+      })
+      .then((response) => {
+        console.log(response);
+        let users = response.data.users || [];
+        console.log(users);
+        users = users.filter((user) => user !== username);
+
+        chrome.runtime
+          .sendMessage({
+            action: "setVideo",
+            payload: [prevVideo, { users: users }],
+          })
+      });
+
+    // get video's users
+    chrome.runtime
+      .sendMessage({
+        action: "getVideo",
+        payload: [currentVideo],
+      })
+      .then((response) => {
+        if (!response.data) {
+          console.log("Video does not exist");
+          chrome.runtime
+            .sendMessage({
+              action: "setVideo",
+              payload: [currentVideo, { users: [username], messages: [] }],
+            });
+        } else {
+          let users = response.data.users || [];
+          users.push(username);
+
+          numViewers = users.length;
+
+          chrome.runtime
+            .sendMessage({
+              action: "setVideo",
+              payload: [currentVideo, { users: users }],
+            });
+        }
+      });
+  }
+
+  updateViewersCount();
+}, 1000);
+
 let partyChatContainer = document.createElement("div");
 
 // add style (text white) to x
@@ -7,10 +192,16 @@ let chatFrame = document.createElement("div");
 chatFrame.className = "sidebar";
 
 let chatTitleWrapper = document.createElement("div");
-chatTitleWrapper.textContent = "{user}'s Watch Party Chat";
+chatTitleWrapper.textContent = `${username}'s Watch Party Chat`;
 chatTitleWrapper.className = "sidebar";
-chatTitleWrapper.style =
-  "box-shadow: none; border-radius: 10px 10px 0 0; padding: 15px; border: none; border-bottom: rgb(63, 63, 63) 1px solid; margin: 0;";
+chatTitleWrapper.style = "box-shadow: none; border-radius: 10px 10px 0 0; padding: 15px; padding-top: 10px; padding-bottom: 10px; border: none; border-bottom: rgb(63, 63, 63) 1px solid; margin: 0; text-align: left;";
+
+chatTitleWrapper.style.display = "flex";
+chatTitleWrapper.style.alignItems = "center";
+chatTitleWrapper.style.justifyContent = "space-between";
+
+chatTitleWrapper.appendChild(chatOnlineViewersCount);
+
 chatFrame.appendChild(chatTitleWrapper);
 
 partyChatContainer.appendChild(chatFrame);
@@ -41,42 +232,39 @@ chatInput.appendChild(chatSubmitButton);
 // Set a max height for the messages wrapper
 
 let observer = new MutationObserver(() => {
-    chatMessagesWrapper.scrollTop = chatMessagesWrapper.scrollHeight;
+  chatMessagesWrapper.scrollTop = chatMessagesWrapper.scrollHeight;
 });
 
 observer.observe(chatMessagesWrapper, { childList: true });
-function sendMessage(party, user, content) {
-  // send message to firestore
-  // add a string "{user} {content}" to the messages array field of the party
-  console.log(`${party}: ${user}: ${content}`);
+function sendMessage(content) {
+  console.log(`${currentVideo}: ${username}: ${content}`);
 
   chrome.runtime
     .sendMessage({
-      action: "getParty",
-      payload: [party],
+      action: "getVideo",
+      payload: [currentVideo],
     })
     .then((response) => {
-      console.log(response);
       let messages = response.data.messages || [];
-      messages.push(`${user} ${content}`);
+      messages.push(`${username},${content}`); // comma-separated
 
       chrome.runtime
         .sendMessage({
-          action: "setParty",
-          payload: [party, { messages: messages }],
-        })
-        .then((response) => {
-          console.log(response);
+          action: "setVideo",
+          payload: [currentVideo, { messages: messages }],
         });
     });
 }
 chatInput.onsubmit = function (e) {
-    e.preventDefault();
-    sendMessage("testParty1", "testUser1", chatTextBox.value);
+  e.preventDefault(); // prevent form submission (no page refresh)
+  if (chatTextBox.value !== "") {
+    // prevent empty messages
+    sendMessage(chatTextBox.value);
     chatTextBox.value = "";
     setTimeout(() => {
-        chatMessagesWrapper.scrollTop = chatMessagesWrapper.scrollHeight;
-    }, 500); // Adding a slight delay to ensure the message is added before scrolling
+      chatMessagesWrapper.scrollTop = chatMessagesWrapper.scrollHeight;
+    }, 500);
+  }
 };
 
 chatFrame.appendChild(chatInput);
@@ -84,34 +272,98 @@ chatFrame.appendChild(chatInput);
 initPartyChat();
 
 // get messages from firestore every 1 second
-setInterval(() => {
+let previousMessages = [];
+
+function updateMessages() {
   chrome.runtime
     .sendMessage({
-      action: "getParty",
-      payload: ["testParty1"],
+      action: "getVideo",
+      payload: [currentVideo],
     })
     .then((response) => {
-    //   chatMessagesWrapper.scrollTop = chatMessagesWrapper.scrollHeight;
-      console.log(response);
-      chatMessagesWrapper.innerHTML = "";
-    response.data.messages.forEach((message) => {
-      let messageElement = document.createElement("div");
-      messageElement.className = "message";
-      
-      let firstSpaceIndex = message.indexOf(',');
-      if (firstSpaceIndex !== -1) {
-        let firstWord = message.substring(0, firstSpaceIndex);
-        let restOfMessage = message.substring(firstSpaceIndex + 1);
-        
-        messageElement.innerHTML = `<strong>${firstWord}</strong> ${restOfMessage}`;
-      } else {
-        messageElement.textContent = message;
+      let newMessages = response.data.messages || [];
+      if (JSON.stringify(newMessages) !== JSON.stringify(previousMessages)) {
+        let wasScrolledToBottom =
+          chatMessagesWrapper.scrollHeight - chatMessagesWrapper.scrollTop ===
+          chatMessagesWrapper.clientHeight;
+
+        chatMessagesWrapper.innerHTML = "";
+        newMessages.forEach((message) => {
+          let messageElement = document.createElement("div");
+          messageElement.className = "message";
+
+          let firstSpaceIndex = message.indexOf(",");
+          if (firstSpaceIndex !== -1) {
+            let firstWord = message.substring(0, firstSpaceIndex);
+            let restOfMessage = message.substring(firstSpaceIndex + 1);
+
+            messageElement.innerHTML = `<strong style = "margin-right: 5px">${firstWord}</strong> ${restOfMessage}`;
+          } else {
+            messageElement.textContent = message;
+          }
+          chatMessagesWrapper.appendChild(messageElement);
+        });
+
+        if (wasScrolledToBottom) {
+          chatMessagesWrapper.scrollTop = chatMessagesWrapper.scrollHeight;
+        }
+
+        previousMessages = newMessages;
       }
-      
-      chatMessagesWrapper.appendChild(messageElement);
     });
+}
+
+let numMessages = 0;
+
+setInterval(updateMessages, 1000);
+/* setInterval(() => {
+  chrome.runtime
+    .sendMessage({
+      action: "getVideo",
+      payload: [currentVideo],
+    })
+    .then((response) => {
+      //   chatMessagesWrapper.scrollTop = chatMessagesWrapper.scrollHeight;
+      // console.log(response);
+      // chatMessagesWrapper.innerHTML = "";
+      let prevNumMessages = numMessages;
+      numMessages = response.data.messages.length;
+      if (numMessages === prevNumMessages) {
+        return;
+      }
+      for (let i = prevNumMessages; i < numMessages; i++) {
+        let message = response.data.messages[i];
+        let messageElement = document.createElement("div");
+        messageElement.className = "message";
+
+        let firstCommaIndex = message.indexOf(",");
+        if (firstCommaIndex !== -1) {
+          let firstWord = message.substring(0, firstCommaIndex);
+          let restOfMessage = message.substring(firstCommaIndex + 1);
+
+          messageElement.innerHTML = `<strong style = "margin-right: 5px">${firstWord}</strong> ${restOfMessage}`;
+        } else {
+          messageElement.textContent = message;
+        }
+        chatMessagesWrapper.appendChild(messageElement);
+      }
+      // response.data.messages.forEach((message) => {
+      //   let messageElement = document.createElement("div");
+      //   messageElement.className = "message";
+
+      //   let firstCommaIndex = message.indexOf(",");
+      //   if (firstCommaIndex !== -1) {
+      //     let firstWord = message.substring(0, firstCommaIndex);
+      //     let restOfMessage = message.substring(firstCommaIndex + 1);
+
+      //     messageElement.innerHTML = `<strong style = "margin-right: 5px">${firstWord}</strong> ${restOfMessage}`;
+      //   } else {
+      //     messageElement.textContent = message;
+      //   }
+      //   chatMessagesWrapper.appendChild(messageElement);
+      // });
     });
-}, 1000);
+}, 1000); */
 
 async function initPartyChat() {
   let ytSecondarySection = await waitForElement("#secondary-inner");
@@ -120,4 +372,3 @@ async function initPartyChat() {
 
   ytSecondarySection.insertBefore(partyChatContainer, ytChatContainer);
 }
-// sleep(5000).then(() => { document.querySelector("#secondary-inner").insertBefore(x,document.querySelector("#chat-container")); });
