@@ -39,12 +39,29 @@ list.style.color = "white";
 list.style.fontSize = "20px";
 
 // populate with fake friend names
-let friends = ["Alice", "Bob", "Charlie", "Dave", "Eve"];
-friends.forEach((friend) => {
-	let listItem = document.createElement("li");
-	listItem.innerHTML = friend;
-	list.appendChild(listItem);
+let friends = chrome.runtime.sendMessage({
+  action: "getUser",
+  payload: "testUser1"
+}).then(response => {
+  let friends = response.data.friends;  // array of friends
+  friends.forEach(friend => {
+    console.log(friend);
+    // get the user referred to by friend
+    chrome.runtime.sendMessage({
+      action: "getUser",
+      payload: friend
+    }).then(response => {
+      let listItem = document.createElement("li");
+      listItem.innerHTML = response.data.name;
+      list.appendChild(listItem);
+    });
+  });
 });
+// friends.forEach((friend) => {
+// 	let listItem = document.createElement("li");
+// 	listItem.innerHTML = friend;
+// 	list.appendChild(listItem);
+// });
 document.body.appendChild(list);
 
 // put the list in the middle of the page
