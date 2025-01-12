@@ -44,8 +44,10 @@ chrome.runtime
 	})
 	.then((response) => {
 		if (!response.data) {
-			let imgtag = document.querySelector("button#avatar-btn > img#img");
-			let pfp = imgtag.src;
+			let pfp = null;
+			waitForElement("button#avatar-btn > img#img").then((element) => {
+				pfp = element.src;
+			});
 			console.log("User does not exist");
 			chrome.runtime.sendMessage({
 				action: "setUser",
