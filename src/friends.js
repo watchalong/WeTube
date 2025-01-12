@@ -39,6 +39,11 @@ onlineList.textContent = "Online Friends";
 onlineList.style.color = "white";
 onlineList.style.fontSize = "20px";
 
+let list = document.createElement("ul");
+list.style.listStyleType = "none";
+list.style.color = "white";
+list.style.fontSize = "20px";
+
 let offlineList = document.createElement("ul");
 offlineList.style.listStyleType = "none";
 offlineList.textContent = "Offline Friends";
