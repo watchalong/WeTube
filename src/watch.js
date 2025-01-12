@@ -31,7 +31,7 @@ chatFrame.appendChild(chatTitleWrapper);
 partyChatContainer.appendChild(chatFrame);
 
 let chatMessagesWrapper = document.createElement("div");
-chatMessagesWrapper.style = "height: 600px;";
+chatMessagesWrapper.className = "messages-wrapper";
 chatFrame.appendChild(chatMessagesWrapper);
 
 let chatInput = document.createElement("form");
@@ -53,38 +53,80 @@ chatSubmitButton.innerHTML =
 chatSubmitButton.style = "margin-left: 10px; vertical-align: middle;";
 
 chatInput.appendChild(chatSubmitButton);
+// Set a max height for the messages wrapper
 
-function sendMessage(party, content) {
-  console.log(`${party}: ${username}: ${content}`);
+let observer = new MutationObserver(() => {
+    chatMessagesWrapper.scrollTop = chatMessagesWrapper.scrollHeight;
+});
 
-  chrome.runtime.sendMessage(
-    {
-      action: "addData",
-      payload: {
-        doc: `parties/${party}`,
-        field: "messages",
-        type: "append",
-        content: username + "," + content,  // comma-separated
-      },
-    },
-    (response) => {
-      response.success ?
-        console.log("Data added successfully!") :
-        console.log("Data not added successfully!");
-    }
-  );
+observer.observe(chatMessagesWrapper, { childList: true });
+function sendMessage(party, user, content) {
+  // send message to firestore
+  // add a string "{user} {content}" to the messages array field of the party
+  console.log(`${party}: ${user}: ${content}`);
+
+  chrome.runtime
+    .sendMessage({
+      action: "getParty",
+      payload: [party],
+    })
+    .then((response) => {
+      console.log(response);
+      let messages = response.data.messages || [];
+      messages.push(`${user} ${content}`);
+
+      chrome.runtime
+        .sendMessage({
+          action: "setParty",
+          payload: [party, { messages: messages }],
+        })
+        .then((response) => {
+          console.log(response);
+        });
+    });
 }
-
 chatInput.onsubmit = function (e) {
-  e.preventDefault();
-  // alert(chatTextBox.value);
-  sendMessage("testParty1", "testUser1", chatTextBox.value);
-  chatTextBox.value = "";
+    e.preventDefault();
+    sendMessage("testParty1", "testUser1", chatTextBox.value);
+    chatTextBox.value = "";
+    setTimeout(() => {
+        chatMessagesWrapper.scrollTop = chatMessagesWrapper.scrollHeight;
+    }, 500); // Adding a slight delay to ensure the message is added before scrolling
 };
 
 chatFrame.appendChild(chatInput);
 
 initPartyChat();
+
+// get messages from firestore every 1 second
+setInterval(() => {
+  chrome.runtime
+    .sendMessage({
+      action: "getParty",
+      payload: ["testParty1"],
+    })
+    .then((response) => {
+    //   chatMessagesWrapper.scrollTop = chatMessagesWrapper.scrollHeight;
+      console.log(response);
+      chatMessagesWrapper.innerHTML = "";
+    response.data.messages.forEach((message) => {
+      let messageElement = document.createElement("div");
+      messageElement.className = "message";
+      
+      let firstSpaceIndex = message.indexOf(',');
+      if (firstSpaceIndex !== -1) {
+        let firstWord = message.substring(0, firstSpaceIndex);
+        let restOfMessage = message.substring(firstSpaceIndex + 1);
+        
+        messageElement.innerHTML = `<strong>${firstWord}</strong> ${restOfMessage}`;
+      } else {
+        messageElement.textContent = message;
+      }
+      
+      chatMessagesWrapper.appendChild(messageElement);
+    });
+    });
+}, 1000);
 
 async function initPartyChat() {
   let ytSecondarySection = await waitForElement("#secondary-inner");

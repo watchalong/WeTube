@@ -2,6 +2,7 @@
   color: #f1f1f1;
   width: 400-18px;
   height: fit-content;
+  max-height: 600px;
   background-color: #0F0F0F;
   left: 0;
   top: 0;
@@ -62,5 +63,45 @@
 
 .sendbutton:click {
   transform: translateY(-1px);
+  box-shadow: 0px 0px 5px 2px rgba(63, 63, 63, 0.35), 0px 0px 1px 2px rgba(73, 73, 73, 0.35);
+}
+
+
+.messages-wrapper {
+  text-align: left;
+  overflow: scroll;
+  max-height: 450px;
+}
+
+.messages-wrapper::-webkit-scrollbar {
+  width: 10px;
+}
+
+.messages-wrapper::-webkit-scrollbar-thumb {
+  background-color: #2E2E2E;
+  border-radius: 10px;
+}
+
+.messages-wrapper::-webkit-scrollbar-track {
+  background-color: #0F0F0F;
+  border-radius: 10px;
+}
+
+.message {
+  text-align: left;
+  text-wrap: wrap;
+  height: fit-content;
+  padding: 10px;
+  border-radius: 10px;
+  margin: 10px;
+  color: #f1f1f1;
+  font-size: 16px;
+  font-family: Roboto, Arial, sans-serif;
+  font-weight: normal;
+}
+
+
+.message:hover {
+  background-color: #2E2E2E;
   box-shadow: 0px 0px 5px 2px rgba(63, 63, 63, 0.35), 0px 0px 1px 2px rgba(73, 73, 73, 0.35);
 }
