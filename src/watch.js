@@ -56,7 +56,7 @@ chatInput.appendChild(chatSubmitButton);
 // Set a max height for the messages wrapper
 
 let observer = new MutationObserver(() => {
-    chatMessagesWrapper.scrollTop = chatMessagesWrapper.scrollHeight;
+  chatMessagesWrapper.scrollTop = chatMessagesWrapper.scrollHeight;
 });
 
 observer.observe(chatMessagesWrapper, { childList: true });
@@ -84,12 +84,12 @@ function sendMessage(party, content) {
     });
 }
 chatInput.onsubmit = function (e) {
-    e.preventDefault();
-    sendMessage("testParty1", chatTextBox.value);
-    chatTextBox.value = "";
-    setTimeout(() => {
-        chatMessagesWrapper.scrollTop = chatMessagesWrapper.scrollHeight;
-    }, 500); // Adding a slight delay to ensure the message is added before scrolling
+  e.preventDefault();
+  sendMessage("testParty1", chatTextBox.value);
+  chatTextBox.value = "";
+  setTimeout(() => {
+    chatMessagesWrapper.scrollTop = chatMessagesWrapper.scrollHeight;
+  }, 500); // Adding a slight delay to ensure the message is added before scrolling
 };
 
 chatFrame.appendChild(chatInput);
@@ -104,25 +104,25 @@ setInterval(() => {
       payload: ["testParty1"],
     })
     .then((response) => {
-    //   chatMessagesWrapper.scrollTop = chatMessagesWrapper.scrollHeight;
+      //   chatMessagesWrapper.scrollTop = chatMessagesWrapper.scrollHeight;
       console.log(response);
       chatMessagesWrapper.innerHTML = "";
-    response.data.messages.forEach((message) => {
-      let messageElement = document.createElement("div");
-      messageElement.className = "message";
-      
-      let firstSpaceIndex = message.indexOf(',');
-      if (firstSpaceIndex !== -1) {
-        let firstWord = message.substring(0, firstSpaceIndex);
-        let restOfMessage = message.substring(firstSpaceIndex + 1);
-        
-        messageElement.innerHTML = `<strong>${firstWord}</strong> ${restOfMessage}`;
-      } else {
-        messageElement.textContent = message;
-      }
-      
-      chatMessagesWrapper.appendChild(messageElement);
-    });
+      response.data.messages.forEach((message) => {
+        let messageElement = document.createElement("div");
+        messageElement.className = "message";
+
+        let firstCommaIndex = message.indexOf(',');
+        if (firstCommaIndex !== -1) {
+          let firstWord = message.substring(0, firstCommaIndex);
+          let restOfMessage = message.substring(firstCommaIndex + 1);
+
+          messageElement.innerHTML = `<strong>${firstWord}</strong> ${restOfMessage}`;
+        } else {
+          messageElement.textContent = message;
+        }
+
+        chatMessagesWrapper.appendChild(messageElement);
+      });
     });
 }, 1000);
 
