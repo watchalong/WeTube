@@ -30,13 +30,16 @@ chatTextBox.type = 'text';
 chatTextBox.placeholder = 'Type a message...';
 chatTextBox.className = "textbox";
 chatInput.appendChild(chatTextBox);
-
-let chatSubmitButton = document.createElement('input');
+let chatSubmitButton = document.createElement('button');
 chatSubmitButton.type = 'submit';
+chatSubmitButton.className = "sendbutton";
+chatSubmitButton.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" focusable="false" aria-hidden="true" style="pointer-events: none; display: inherit; width: 100%; height: 100%; fill: white;"><path d="M5 12 3 3l19 9-19 9 2-9zm.82.93-1.4 6.29L19.66 12 4.42 4.78l1.4 6.29L17 12l-11.18.93z" fill-rule="evenodd"></path></svg>';
+
+chatSubmitButton.style = "margin-left: 10px; vertical-align: middle;";
+
 chatInput.appendChild(chatSubmitButton);
 
 chatInput.onsubmit = function(e) {
-    
     e.preventDefault();
     alert(chatTextBox.value);
     chatTextBox.value = '';
@@ -44,14 +47,11 @@ chatInput.onsubmit = function(e) {
 
 chatFrame.appendChild(chatInput);
 
-
 initPartyChat();
 
 async function initPartyChat() {
-    let ytSecondarySection  = await waitForElement("#secondary-inner");
-
+    let ytSecondarySection = await waitForElement("#secondary-inner");
     let ytChatContainer = await waitForElement("#chat-container");
-
     ytSecondarySection.insertBefore(partyChatContainer, ytChatContainer);
 }
 // sleep(5000).then(() => { document.querySelector("#secondary-inner").insertBefore(x,document.querySelector("#chat-container")); });
