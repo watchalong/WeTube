@@ -35,25 +35,6 @@ function waitForElement(selector, timeout = 10000) {
   });
 }
 
-function sendMessage(party, user, content) {
-  // send message to firestore
-  // add a string "{user} {content}" to the messages array field of the party
-  console.log($`${party}: ${user}: ${content}`);
-
-  chrome.runtime.sendMessage({
-    action: "addData", payload: {
-      doc: $`parties/${party}`,
-      field: "messages",
-      type: "append",
-      content: user + " " + content
-    }
-  }, (response) => {
-    response.success ?
-      console.log("Data added successfully!") :
-      console.log("Data not added successfully!");
-  });
-}
-
 async function init() {
   console.log("\n\n\n\n\n\nWETUBE\n\n\n\n\n\n");
   try {

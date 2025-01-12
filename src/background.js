@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
-import { getFirestore, collection, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
+import { getFirestore, collection, doc, getDoc, updateDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCOi5de8KDLAbOGQZsLHI06QIIYfFTyoLo",  // FIXME: .env
@@ -19,6 +19,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     sendResponse({ data });
     return true;
   } else if (request.action === "addData") {
+    console.log(request);
     let value = (request.payload.type === "append") ?
       arrayUnion(request.payload.content) :
       request.payload.content;
