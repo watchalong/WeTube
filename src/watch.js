@@ -180,7 +180,7 @@ chatFrame.className = "sidebar";
 let chatTitleWrapper = document.createElement("div");
 chatTitleWrapper.textContent = `${username}'s Watch Party Chat`;
 chatTitleWrapper.className = "sidebar";
-chatTitleWrapper.style = "box-shadow: none; border-radius: 10px 10px 0 0; padding: 15px; border: none; border-bottom: rgb(63, 63, 63) 1px solid; margin: 0; text-align: left;";
+chatTitleWrapper.style = "box-shadow: none; border-radius: 10px 10px 0 0; padding: 15px; padding-top: 10px; padding-bottom: 10px; border: none; border-bottom: rgb(63, 63, 63) 1px solid; margin: 0; text-align: left;";
 
 chatTitleWrapper.style.display = "flex";
 chatTitleWrapper.style.alignItems = "center";
