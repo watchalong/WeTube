@@ -45,18 +45,30 @@ offlineList.textContent = "Offline Friends";
 offlineList.style.color = "white";
 offlineList.style.fontSize = "20px";
 // populate with fake friend names
-let friends = {"Alice":true, "Bob":false, "Charlie":false, "Dave":false, "Eve":true};
-Object.entries(friends).forEach(([friend, onlineStatus]) => {
-  let listItem = document.createElement("li");
-  listItem.innerHTML = friend;
-  if (onlineStatus) {
-    onlineList.appendChild(listItem);
-  } else {
-    offlineList.appendChild(listItem);
-  }
+let friends = chrome.runtime.sendMessage({
+  action: "getUser",
+  payload: "testUser1"
+}).then(response => {
+  let friends = response.data.friends;  // array of friends
+  friends.forEach(friend => {
+    console.log(friend);
+    // get the user referred to by friend
+    chrome.runtime.sendMessage({
+      action: "getUser",
+      payload: friend
+    }).then(response => {
+      let listItem = document.createElement("li");
+      listItem.innerHTML = response.data.name;
+      list.appendChild(listItem);
+    });
+  });
 });
-document.body.appendChild(onlineList);
-document.body.appendChild(offlineList);
+// friends.forEach((friend) => {
+// 	let listItem = document.createElement("li");
+// 	listItem.innerHTML = friend;
+// 	list.appendChild(listItem);
+// });
+document.body.appendChild(list);
 
 // put the lists in the middle of the page
 onlineList.style.position = "absolute";
