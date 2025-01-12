@@ -1,8 +1,15 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
-import { getFirestore, collection, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
+import {
+	getFirestore,
+	collection,
+	doc,
+	getDoc,
+	updateDoc,
+	arrayUnion,
+} from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
 
 const firebaseConfig = {
-	apiKey: "AIzaSyCOi5de8KDLAbOGQZsLHI06QIIYfFTyoLo",
+	apiKey: "AIzaSyCOi5de8KDLAbOGQZsLHI06QIIYfFTyoLo", // FIXME: .env
 	authDomain: "wetube-1edf0.firebaseapp.com",
 	projectId: "wetube-1edf0",
 	storageBucket: "wetube-1edf0.firebasestorage.app",
