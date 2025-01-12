@@ -173,8 +173,19 @@ chatFrame.className = "sidebar";
 let chatTitleWrapper = document.createElement("div");
 chatTitleWrapper.textContent = `${username}'s Watch Party Chat`;
 chatTitleWrapper.className = "sidebar";
-chatTitleWrapper.style =
-  "box-shadow: none; border-radius: 10px 10px 0 0; padding: 15px; border: none; border-bottom: rgb(63, 63, 63) 1px solid; margin: 0;";
+chatTitleWrapper.style = "box-shadow: none; border-radius: 10px 10px 0 0; padding: 15px; border: none; border-bottom: rgb(63, 63, 63) 1px solid; margin: 0; text-align: left;";
+
+chatTitleWrapper.style.display = "flex";
+chatTitleWrapper.style.alignItems = "center";
+chatTitleWrapper.style.justifyContent = "space-between";
+chatOnlineViewersCount = document.createElement("div");
+chatOnlineViewersCount.innerHTML = '<span style="color: green; font-size: 30px; margin:0; vertical-align: middle;">•</span> {viewers} viewers';
+chatOnlineViewersCount.className = "viewers-count";
+chatTitleWrapper.style.alignItems = "center";
+chatOnlineViewersCount.style.marginLeft = "auto";
+
+chatTitleWrapper.appendChild(chatOnlineViewersCount);
+
 chatFrame.appendChild(chatTitleWrapper);
 
 partyChatContainer.appendChild(chatFrame);
