@@ -286,6 +286,8 @@ function updateMessages() {
     });
 }
 
+let numMessages = 0;
+
 setInterval(updateMessages, 1000);
 setInterval(() => {
   chrome.runtime
@@ -296,8 +298,14 @@ setInterval(() => {
     .then((response) => {
       //   chatMessagesWrapper.scrollTop = chatMessagesWrapper.scrollHeight;
       // console.log(response);
-      chatMessagesWrapper.innerHTML = "";
-      response.data.messages.forEach((message) => {
+      // chatMessagesWrapper.innerHTML = "";
+      let prevNumMessages = numMessages;
+      numMessages = response.data.messages.length;
+      if (numMessages === prevNumMessages) {
+        return;
+      }
+      for (let i = prevNumMessages; i < numMessages; i++) {
+        let message = response.data.messages[i];
         let messageElement = document.createElement("div");
         messageElement.className = "message";
 
@@ -311,7 +319,22 @@ setInterval(() => {
           messageElement.textContent = message;
         }
         chatMessagesWrapper.appendChild(messageElement);
-      });
+      }
+      // response.data.messages.forEach((message) => {
+      //   let messageElement = document.createElement("div");
+      //   messageElement.className = "message";
+
+      //   let firstCommaIndex = message.indexOf(",");
+      //   if (firstCommaIndex !== -1) {
+      //     let firstWord = message.substring(0, firstCommaIndex);
+      //     let restOfMessage = message.substring(firstCommaIndex + 1);
+
+      //     messageElement.innerHTML = `<strong style = "margin-right: 5px">${firstWord}</strong> ${restOfMessage}`;
+      //   } else {
+      //     messageElement.textContent = message;
+      //   }
+      //   chatMessagesWrapper.appendChild(messageElement);
+      // });
     });
 }, 1000);
 
