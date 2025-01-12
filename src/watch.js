@@ -23,6 +23,7 @@ function getVideoID() {
 }
 
 let currentVideo = getVideoID();
+let numViewers = 1;
 
 // check if user exists in firestore
 chrome.runtime
@@ -60,6 +61,8 @@ chrome.runtime
             let users = response.data.users || [];
             users.push(username);
 
+            numViewers = users.length;
+
             chrome.runtime
               .sendMessage({
                 action: "setVideo",
@@ -90,6 +93,8 @@ chrome.runtime
           } else {
             let users = response.data.users || [];
             users.push(username);
+
+            numViewers = users.length;
 
             chrome.runtime
               .sendMessage({
@@ -152,6 +157,8 @@ setInterval(() => {
           let users = response.data.users || [];
           users.push(username);
 
+          numViewers = users.length;
+
           chrome.runtime
             .sendMessage({
               action: "setVideo",
@@ -179,7 +186,7 @@ chatTitleWrapper.style.display = "flex";
 chatTitleWrapper.style.alignItems = "center";
 chatTitleWrapper.style.justifyContent = "space-between";
 chatOnlineViewersCount = document.createElement("div");
-chatOnlineViewersCount.innerHTML = '<span style="color: green; font-size: 30px; margin:0; vertical-align: middle;">•</span> {viewers} viewers';
+chatOnlineViewersCount.innerHTML = `<span style="color: green; font-size: 30px; margin:0; vertical-align: middle;">•</span> ${numViewers} viewers`;
 chatOnlineViewersCount.className = "viewers-count";
 chatTitleWrapper.style.alignItems = "center";
 chatOnlineViewersCount.style.marginLeft = "auto";
@@ -300,54 +307,54 @@ function updateMessages() {
 let numMessages = 0;
 
 setInterval(updateMessages, 1000);
-// setInterval(() => {
-//   chrome.runtime
-//     .sendMessage({
-//       action: "getVideo",
-//       payload: [currentVideo],
-//     })
-//     .then((response) => {
-//       //   chatMessagesWrapper.scrollTop = chatMessagesWrapper.scrollHeight;
-//       // console.log(response);
-//       // chatMessagesWrapper.innerHTML = "";
-//       let prevNumMessages = numMessages;
-//       numMessages = response.data.messages.length;
-//       if (numMessages === prevNumMessages) {
-//         return;
-//       }
-//       for (let i = prevNumMessages; i < numMessages; i++) {
-//         let message = response.data.messages[i];
-//         let messageElement = document.createElement("div");
-//         messageElement.className = "message";
+/* setInterval(() => {
+  chrome.runtime
+    .sendMessage({
+      action: "getVideo",
+      payload: [currentVideo],
+    })
+    .then((response) => {
+      //   chatMessagesWrapper.scrollTop = chatMessagesWrapper.scrollHeight;
+      // console.log(response);
+      // chatMessagesWrapper.innerHTML = "";
+      let prevNumMessages = numMessages;
+      numMessages = response.data.messages.length;
+      if (numMessages === prevNumMessages) {
+        return;
+      }
+      for (let i = prevNumMessages; i < numMessages; i++) {
+        let message = response.data.messages[i];
+        let messageElement = document.createElement("div");
+        messageElement.className = "message";
 
-//         let firstCommaIndex = message.indexOf(",");
-//         if (firstCommaIndex !== -1) {
-//           let firstWord = message.substring(0, firstCommaIndex);
-//           let restOfMessage = message.substring(firstCommaIndex + 1);
+        let firstCommaIndex = message.indexOf(",");
+        if (firstCommaIndex !== -1) {
+          let firstWord = message.substring(0, firstCommaIndex);
+          let restOfMessage = message.substring(firstCommaIndex + 1);
 
-//           messageElement.innerHTML = `<strong style = "margin-right: 5px">${firstWord}</strong> ${restOfMessage}`;
-//         } else {
-//           messageElement.textContent = message;
-//         }
-//         chatMessagesWrapper.appendChild(messageElement);
-//       }
-//       // response.data.messages.forEach((message) => {
-//       //   let messageElement = document.createElement("div");
-//       //   messageElement.className = "message";
+          messageElement.innerHTML = `<strong style = "margin-right: 5px">${firstWord}</strong> ${restOfMessage}`;
+        } else {
+          messageElement.textContent = message;
+        }
+        chatMessagesWrapper.appendChild(messageElement);
+      }
+      // response.data.messages.forEach((message) => {
+      //   let messageElement = document.createElement("div");
+      //   messageElement.className = "message";
 
-//       //   let firstCommaIndex = message.indexOf(",");
-//       //   if (firstCommaIndex !== -1) {
-//       //     let firstWord = message.substring(0, firstCommaIndex);
-//       //     let restOfMessage = message.substring(firstCommaIndex + 1);
+      //   let firstCommaIndex = message.indexOf(",");
+      //   if (firstCommaIndex !== -1) {
+      //     let firstWord = message.substring(0, firstCommaIndex);
+      //     let restOfMessage = message.substring(firstCommaIndex + 1);
 
-//       //     messageElement.innerHTML = `<strong style = "margin-right: 5px">${firstWord}</strong> ${restOfMessage}`;
-//       //   } else {
-//       //     messageElement.textContent = message;
-//       //   }
-//       //   chatMessagesWrapper.appendChild(messageElement);
-//       // });
-//     });
-// }, 1000);
+      //     messageElement.innerHTML = `<strong style = "margin-right: 5px">${firstWord}</strong> ${restOfMessage}`;
+      //   } else {
+      //     messageElement.textContent = message;
+      //   }
+      //   chatMessagesWrapper.appendChild(messageElement);
+      // });
+    });
+}, 1000); */
 
 async function initPartyChat() {
   let ytSecondarySection = await waitForElement("#secondary-inner");
