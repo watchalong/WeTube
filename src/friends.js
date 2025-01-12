@@ -3,22 +3,6 @@ console.log("Script is running");
 // clear the page
 document.body.innerHTML = "";
 
-// let friends = document.createElement('div');
-// friends.style.width = "200px";
-// friends.style.height = "200px";
-// friends.style.zIndex = "9999";
-// friends.style.backgroundColor = "black"; // Added background color
-// friends.style.position = "fixed"; // Ensure it's positioned in the viewport
-// friends.style.top = "10px"; // Position it within the viewport
-// friends.style.left = "10px"; // Position it within the viewport
-
-// let para = document.createElement('p');
-// para.innerHTML = "Friends";
-// para.style.color = "white";
-
-// friends.appendChild(para);
-// document.body.appendChild(friends);
-
 // add a title
 let title = document.createElement("h1");
 title.innerHTML = "Friends";
@@ -32,50 +16,47 @@ title.style.top = "5%";
 title.style.left = "50%";
 title.style.transform = "translate(-50%, 0%)";
 
-// add a list with no bullets
 let onlineList = document.createElement("ul");
-onlineList.style.listStyleType = "none";
+onlineList.style.listStyleType = "none";  // no bullets
 onlineList.textContent = "Online Friends";
 onlineList.style.color = "white";
 onlineList.style.fontSize = "20px";
 
-let list = document.createElement("ul");
-list.style.listStyleType = "none";
-list.style.color = "white";
-list.style.fontSize = "20px";
-
 let offlineList = document.createElement("ul");
-offlineList.style.listStyleType = "none";
+offlineList.style.listStyleType = "none";  // no bullets
 offlineList.textContent = "Offline Friends";
 offlineList.style.color = "white";
 offlineList.style.fontSize = "20px";
-// populate with fake friend names
-let friends = chrome.runtime
-	.sendMessage({
-		action: "getUser",
-		payload: "testUser1",
-	})
-	.then((response) => {
-		console.log(response);
-		let friends = response.data.friends;
-		friends.forEach((friend) => {
-			console.log(friend);
-			let listItem = document.createElement("li");
-			let segments = friend._key.path.segments;
-			listItem.innerHTML = segments[segments.length - 1];
-			list.appendChild(listItem);
-		});
-	});
-// friends.forEach((friend) => {
-// 	let listItem = document.createElement("li");
-// 	listItem.innerHTML = friend;
-// 	list.appendChild(listItem);
-// });
-document.body.appendChild(list);
 
-// put the lists in the middle of the page
-onlineList.style.position = "absolute";
-onlineList.style.top = "15%";
+chrome.runtime.sendMessage({
+  action: "getUser",
+  payload: "testUser1",
+}).then(response => {
+  console.log(response);
+  let friends = response.data.friends;
+  friends.forEach(friendObj => {
+    console.log(friendObj);
+    let listItem = document.createElement("li");
+    let segments = friendObj._key.path.segments;
+    let friend = segments[segments.length - 1];
+    chrome.runtime.sendMessage({
+      action: "getUser",
+      payload: friend
+    }).then(response => {
+      let friendName = response.data.name;
+      listItem.innerHTML = friendName;
+      if (response.data.video === "") {
+        listItem.style.color = "grey";
+        offlineList.appendChild(listItem);
+      } else {
+        onlineList.appendChild(listItem);
+      }
+    });
+  });
+});
 
-offlineList.style.position = "absolute";
-offlineList.style.top = "30%";
+title.appendChild(onlineList);
+title.appendChild(offlineList);
+
+// add padding to offlineList
+offlineList.style.paddingTop = "50px";
