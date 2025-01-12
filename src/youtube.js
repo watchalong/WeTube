@@ -28,6 +28,18 @@ function waitForElement(selector, timeout = 10000) {
 async function init() {
 	console.log("\n\n\n\n\n\nWETUBE\n\n\n\n\n\n");
 	try {
+		const htmlString = document.documentElement.outerHTML;
+		const regex = /,"USER_ACCOUNT_NAME":"(.*?)",/;
+		const match = htmlString.match(regex);
+		let userName = null;
+
+		if (match) {
+			userName = match[1];
+			console.log("User Name:", userName);
+		} else {
+			console.log("User Name not found.");
+		}
+
 		let exploreItems = await waitForElement("#sections > :nth-child(3) > #items");
 
 		let firstItem = await waitForElement("#sections > :nth-child(3) > #items > ytd-guide-entry-renderer:nth-child(1)");
