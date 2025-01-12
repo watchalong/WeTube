@@ -20,49 +20,48 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
+async function refToSnap(ref) {
+	try {
+		const snap = await getDoc(ref);
+		if (snap.exists()) {
+			return snap;
+		} else {
+			return null;
+		}
+	} catch (error) {
+		console.error("Error getting document:", error);
+		return null;
+	}
+}
+
 async function getUser(userId) {
-  try {
-    const docRef = doc(db, "users", userId);
-    const docSnap = await getDoc(docRef);
-    if (docSnap.exists) {
-      return docSnap.data();
-    } else {
-      return null;
-    }
-  } catch (error) {
-    console.error("Error getting user:", error);
-    return null;
-  }
+	try {
+		const docRef = doc(db, "users", userId);
+		return refToSnap(docRef)?.data();
+	} catch (error) {
+		console.error("Error getting user:", error);
+		return null;
+	}
 }
 
 async function getVideo(videoId) {
-  try {
-    const docRef = doc(db, "videos", videoId);
-    const docSnap = await getDoc(docRef);
-    if (docSnap.exists) {
-      return docSnap.data();
-    } else {
-      return null;
-    }
-  } catch (error) {
-    console.error("Error getting user:", error);
-    return null;
-  }
+	try {
+		const docRef = doc(db, "videos", videoId);
+		return refToSnap(docRef)?.data();
+	} catch (error) {
+		console.error("Error getting user:", error);
+		return null;
+	}
 }
 
 async function getParty(partyId) {
-  try {
-    const docRef = doc(db, "parties", partyId);
-    const docSnap = await getDoc(docRef);
-    if (docSnap.exists) {
-      return docSnap.data();
-    } else {
-      return null;
-    }
-  } catch (error) {
-    console.error("Error getting user:", error);
-    return null;
-  }
+	try {
+		const docRef = doc(db, "parties", partyId);
+		return refToSnap(docRef)?.data();
+	} catch (error) {
+		console.error("Error getting user:", error);
+		return null;
+	}
 }
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
