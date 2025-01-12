@@ -85,7 +85,7 @@ function sendMessage(party, content) {
 }
 chatInput.onsubmit = function (e) {
     e.preventDefault();
-    sendMessage("testParty1", "testUser1", chatTextBox.value);
+    sendMessage("testParty1", chatTextBox.value);
     chatTextBox.value = "";
     setTimeout(() => {
         chatMessagesWrapper.scrollTop = chatMessagesWrapper.scrollHeight;
