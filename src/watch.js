@@ -186,7 +186,7 @@ chatTitleWrapper.style.display = "flex";
 chatTitleWrapper.style.alignItems = "center";
 chatTitleWrapper.style.justifyContent = "space-between";
 chatOnlineViewersCount = document.createElement("div");
-chatOnlineViewersCount.innerHTML = `<span style="color: green; font-size: 30px; margin:0; vertical-align: middle;">•</span> ${numViewers} viewers`;
+chatOnlineViewersCount.innerHTML = `<span style="color: green; font-size: 30px; margin:0; vertical-align: middle;">•</span> ${numViewers} viewer(s)`;
 chatOnlineViewersCount.className = "viewers-count";
 chatTitleWrapper.style.alignItems = "center";
 chatOnlineViewersCount.style.marginLeft = "auto";
