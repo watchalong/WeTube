@@ -33,22 +33,34 @@ title.style.left = "50%";
 title.style.transform = "translate(-50%, 0%)";
 
 // add a list with no bullets
-let list = document.createElement("ul");
-list.style.listStyleType = "none";
-list.style.color = "white";
-list.style.fontSize = "20px";
+let onlineList = document.createElement("ul");
+onlineList.style.listStyleType = "none";
+onlineList.textContent = "Online Friends";
+onlineList.style.color = "white";
+onlineList.style.fontSize = "20px";
 
+let offlineList = document.createElement("ul");
+offlineList.style.listStyleType = "none";
+offlineList.textContent = "Offline Friends";
+offlineList.style.color = "white";
+offlineList.style.fontSize = "20px";
 // populate with fake friend names
-let friends = ["Alice", "Bob", "Charlie", "Dave", "Eve"];
-friends.forEach((friend) => {
-	let listItem = document.createElement("li");
-	listItem.innerHTML = friend;
-	list.appendChild(listItem);
+let friends = {"Alice":true, "Bob":false, "Charlie":false, "Dave":false, "Eve":true};
+Object.entries(friends).forEach(([friend, onlineStatus]) => {
+  let listItem = document.createElement("li");
+  listItem.innerHTML = friend;
+  if (onlineStatus) {
+    onlineList.appendChild(listItem);
+  } else {
+    offlineList.appendChild(listItem);
+  }
 });
-document.body.appendChild(list);
+document.body.appendChild(onlineList);
+document.body.appendChild(offlineList);
 
-// put the list in the middle of the page
-list.style.position = "absolute";
-list.style.top = "15%";
-list.style.left = "30%";
-list.style.transform = "translate(-50%, 0%)";
+// put the lists in the middle of the page
+onlineList.style.position = "absolute";
+onlineList.style.top = "15%";
+
+offlineList.style.position = "absolute";
+offlineList.style.top = "30%";
