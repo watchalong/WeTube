@@ -1,13 +1,21 @@
-{
-	if (document.readyState !== "loading") {
-		console.log("document is already ready");
-		init();
-	} else {
-		document.addEventListener("DOMContentLoaded", function () {
-			console.log("document was not ready");
-			init();
-		});
+chrome.runtime.sendMessage({ action: "fetchData" }, (response) => {
+	console.log("Fetched Data from Firestore:", response.data);
+});
+
+chrome.runtime.sendMessage({ action: "addData", payload: newData }, (response) => {
+	if (response.success) {
+		console.log("Data added successfully!");
 	}
+});
+
+if (document.readyState !== "loading") {
+	console.log("document is already ready");
+	init();
+} else {
+	document.addEventListener("DOMContentLoaded", function () {
+		console.log("document was not ready");
+		init();
+	});
 }
 
 function waitForElement(selector, timeout = 10000) {
