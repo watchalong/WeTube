@@ -20,11 +20,11 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-async function refToSnap(ref) {
+async function refToData(ref) {
 	try {
 		const snap = await getDoc(ref);
 		if (snap.exists()) {
-			return snap;
+			return snap.data();
 		} else {
 			return null;
 		}
@@ -37,7 +37,12 @@ async function refToSnap(ref) {
 async function getUser(userId) {
 	try {
 		const docRef = doc(db, "users", userId);
-		return refToSnap(docRef)?.data();
+		const docSnap = await getDoc(docRef);
+		if (docSnap.exists) {
+			return docSnap.data();
+		} else {
+			return null;
+		}
 	} catch (error) {
 		console.error("Error getting user:", error);
 		return null;
@@ -47,7 +52,12 @@ async function getUser(userId) {
 async function getVideo(videoId) {
 	try {
 		const docRef = doc(db, "videos", videoId);
-		return refToSnap(docRef)?.data();
+		const docSnap = await getDoc(docRef);
+		if (docSnap.exists) {
+			return docSnap.data();
+		} else {
+			return null;
+		}
 	} catch (error) {
 		console.error("Error getting user:", error);
 		return null;
@@ -57,7 +67,12 @@ async function getVideo(videoId) {
 async function getParty(partyId) {
 	try {
 		const docRef = doc(db, "parties", partyId);
-		return refToSnap(docRef)?.data();
+		const docSnap = await getDoc(docRef);
+		if (docSnap.exists) {
+			return docSnap.data();
+		} else {
+			return null;
+		}
 	} catch (error) {
 		console.error("Error getting user:", error);
 		return null;
