@@ -22,7 +22,7 @@ let chatFrame = document.createElement("div");
 chatFrame.className = "sidebar";
 
 let chatTitleWrapper = document.createElement("div");
-chatTitleWrapper.textContent = "{user}'s Watch Party Chat";
+chatTitleWrapper.textContent = `${username}'s Watch Party Chat`;
 chatTitleWrapper.className = "sidebar";
 chatTitleWrapper.style =
   "box-shadow: none; border-radius: 10px 10px 0 0; padding: 15px; border: none; border-bottom: rgb(63, 63, 63) 1px solid; margin: 0;";
@@ -60,10 +60,8 @@ let observer = new MutationObserver(() => {
 });
 
 observer.observe(chatMessagesWrapper, { childList: true });
-function sendMessage(party, user, content) {
-  // send message to firestore
-  // add a string "{user} {content}" to the messages array field of the party
-  console.log(`${party}: ${user}: ${content}`);
+function sendMessage(party, content) {
+  console.log(`${party}: ${username}: ${content}`);
 
   chrome.runtime
     .sendMessage({
@@ -73,7 +71,7 @@ function sendMessage(party, user, content) {
     .then((response) => {
       console.log(response);
       let messages = response.data.messages || [];
-      messages.push(`${user} ${content}`);
+      messages.push(`${username},${content}`);  // comma-separated
 
       chrome.runtime
         .sendMessage({
