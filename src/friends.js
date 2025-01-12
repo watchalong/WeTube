@@ -56,20 +56,14 @@ let friends = chrome.runtime
 		payload: "testUser1",
 	})
 	.then((response) => {
-		let friends = response.data.friends; // array of friends
+		console.log(response);
+		let friends = response.data.friends;
 		friends.forEach((friend) => {
 			console.log(friend);
-			// get the user referred to by friend
-			chrome.runtime
-				.sendMessage({
-					action: "getUser",
-					payload: friend,
-				})
-				.then((response) => {
-					let listItem = document.createElement("li");
-					listItem.innerHTML = response.data.name;
-					list.appendChild(listItem);
-				});
+			let listItem = document.createElement("li");
+			let segments = friend._key.path.segments;
+			listItem.innerHTML = segments[segments.length - 1];
+			list.appendChild(listItem);
 		});
 	});
 // friends.forEach((friend) => {
