@@ -2,7 +2,7 @@ chrome.runtime.sendMessage({ action: "fetchData" }, (response) => {
 	console.log("Fetched Data from Firestore:", response.data);
 });
 
-chrome.runtime.sendMessage({ action: "addData", payload: newData }, (response) => {
+chrome.runtime.sendMessage({ action: "addData", payload: "newData" }, (response) => {
 	if (response.success) {
 		console.log("Data added successfully!");
 	}
