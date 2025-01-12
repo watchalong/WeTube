@@ -36,6 +36,20 @@ function updateViewersCount() {
 		(numViewers === 1 ? " viewer" : " viewers");
 }
 
+var videoElement = document.querySelector('video');
+videoElement.addEventListener('pause', function() {
+  console.log('Video has been paused');
+  console.log("videoElement.currentTime")
+  // Add your custom pause handling code here
+});
+
+videoElement.addEventListener('play', function() {
+    console.log('Video has been played');
+    // Add your custom pause handling code here
+    alert("Video has been played");
+    console.log("videoElement.currentTime")
+});
+
 // check if user exists in firestore
 chrome.runtime
 	.sendMessage({
@@ -94,22 +108,26 @@ chrome.runtime
 				payload: [username, { video: currentVideo }],
 			});
 
-			chrome.runtime
-				.sendMessage({
-					action: "getVideo",
-					payload: [currentVideo],
-				})
-				.then((response) => {
-					if (!response.data) {
-						console.log("Video does not exist");
-						let title = document.querySelector("#title > h1 > yt-formatted-string").textContent;
-						chrome.runtime.sendMessage({
-							action: "setVideo",
-							payload: [currentVideo, { users: [username], messages: [], title: title }],
-						});
-					} else {
-						let users = response.data.users || [];
-						users.push(username);
+      chrome.runtime
+        .sendMessage({
+          action: "getVideo",
+          payload: [currentVideo],
+        })
+        .then((response) => {
+          if (!response.data) {
+            console.log("Video does not exist");
+            waitForElement("#title > h1 > yt-formatted-string").then((element) => {
+              let title = element.textContent;
+              console.log(title);
+              chrome.runtime
+                .sendMessage({
+                  action: "setVideo",
+                  payload: [currentVideo, { users: [username], messages: [], title: title }],
+                });
+            });
+          } else {
+            let users = response.data.users || [];
+            users.push(username);
 
 						numViewers = users.length;
 
