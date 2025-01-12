@@ -1,60 +1,79 @@
 chrome.runtime.sendMessage({ action: "fetchData" }, (response) => {
-	console.log("Fetched Data from Firestore:", response.data);
+  console.log("Fetched Data from Firestore:", response.data);
 });
 
 chrome.runtime.sendMessage({ action: "addData", payload: "newData" }, (response) => {
-	if (response.success) {
-		console.log("Data added successfully!");
-	}
+  if (response.success) {
+    console.log("Data added successfully!");
+  }
 });
 
 if (document.readyState !== "loading") {
-	console.log("document is already ready");
-	init();
+  console.log("document is already ready");
+  init();
 } else {
-	document.addEventListener("DOMContentLoaded", function () {
-		console.log("document was not ready");
-		init();
-	});
+  document.addEventListener("DOMContentLoaded", function () {
+    console.log("document was not ready");
+    init();
+  });
 }
 
 function waitForElement(selector, timeout = 10000) {
-	return new Promise((resolve, reject) => {
-		const startTime = Date.now();
+  return new Promise((resolve, reject) => {
+    const startTime = Date.now();
 
-		const interval = setInterval(() => {
-			const element = document.querySelector(selector);
-			if (element) {
-				clearInterval(interval);
-				resolve(element);
-			} else if (Date.now() - startTime >= timeout) {
-				clearInterval(interval);
-				reject(new Error("Element with selector " + selector + " not found within " + timeout + "ms"));
-			}
-		}, 100);
-	});
+    const interval = setInterval(() => {
+      const element = document.querySelector(selector);
+      if (element) {
+        clearInterval(interval);
+        resolve(element);
+      } else if (Date.now() - startTime >= timeout) {
+        clearInterval(interval);
+        reject(new Error("Element with selector " + selector + " not found within " + timeout + "ms"));
+      }
+    }, 100);
+  });
+}
+
+function sendMessage(party, user, content) {
+  // send message to firestore
+  // add a string "{user} {content}" to the messages array field of the party
+  console.log($`${party}: ${user}: ${content}`);
+
+  chrome.runtime.sendMessage({
+    action: "addData", payload: {
+      doc: $`parties/${party}`,
+      field: "messages",
+      type: "append",
+      content: user + " " + content
+    }
+  }, (response) => {
+    response.success ?
+      console.log("Data added successfully!") :
+      console.log("Data not added successfully!");
+  });
 }
 
 async function init() {
-	console.log("\n\n\n\n\n\nWETUBE\n\n\n\n\n\n");
-	try {
-		let sections = await waitForElement("#sections");
-		console.log(sections);
-		let explore = await waitForElement("#sections > :nth-child(3)");
-		console.log(explore);
-		let exploreItems = await waitForElement("#sections > :nth-child(3) > #items");
-		console.log(exploreItems);
+  console.log("\n\n\n\n\n\nWETUBE\n\n\n\n\n\n");
+  try {
+    let sections = await waitForElement("#sections");
+    console.log(sections);
+    let explore = await waitForElement("#sections > :nth-child(3)");
+    console.log(explore);
+    let exploreItems = await waitForElement("#sections > :nth-child(3) > #items");
+    console.log(exploreItems);
 
-		let firstItem = await waitForElement("#sections > :nth-child(3) > #items > ytd-guide-entry-renderer:nth-child(1)");
-		let friendTab = firstItem.cloneNode(true);
-		friendTab.querySelector("a").href = "/feed/friends";
-		friendTab.querySelector("a").title = "Friends";
-		friendTab.querySelector("yt-formatted-string").textContent = "Friends";
-		exploreItems.appendChild(friendTab);
+    let firstItem = await waitForElement("#sections > :nth-child(3) > #items > ytd-guide-entry-renderer:nth-child(1)");
+    let friendTab = firstItem.cloneNode(true);
+    friendTab.querySelector("a").href = "/feed/friends";
+    friendTab.querySelector("a").title = "Friends";
+    friendTab.querySelector("yt-formatted-string").textContent = "Friends";
+    exploreItems.appendChild(friendTab);
 
-		friendTab.querySelector("yt-formatted-string").removeAttribute("is-empty");
-		friendTab.querySelector("yt-formatted-string").innerHTML = "Friends";
-	} catch (error) {
-		console.error("Error: ", error);
-	}
+    friendTab.querySelector("yt-formatted-string").removeAttribute("is-empty");
+    friendTab.querySelector("yt-formatted-string").innerHTML = "Friends";
+  } catch (error) {
+    console.error("Error: ", error);
+  }
 }
