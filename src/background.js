@@ -44,14 +44,14 @@ async function setDocument(collectionName, docId, data) {
 	}
 }
 
-async function appendDocument(collectionName, data) {
+async function addDocument(collectionName, data) {
 	try {
 		const collRef = collection(db, collectionName);
 		const docRef = await addDoc(collRef, data);
 		return { success: true, id: docRef.id };
 	} catch (error) {
-		console.error(`Error appending to ${collectionName}:`, error);
-		throw new Error(`Failed to append to ${collectionName}`);
+		console.error(`Error add to ${collectionName}:`, error);
+		throw new Error(`Failed to add to ${collectionName}`);
 	}
 }
 
@@ -75,9 +75,9 @@ const databaseFunctions = {
 	setVideo: (videoId, data) => setDocument("videos", videoId, data),
 	setParty: (partyId, data) => setDocument("parties", partyId, data),
 
-	appendUser: (data) => appendDocument("users", data),
-	appendVideo: (data) => appendDocument("videos", data),
-	appendParty: (data) => appendDocument("parties", data),
+	addUser: (data) => addDocument("users", data),
+	addVideo: (data) => addDocument("videos", data),
+	addParty: (data) => addDocument("parties", data),
 
 	deleteUser: (userId) => deleteDocument("users", userId),
 	deleteVideo: (videoId) => deleteDocument("videos", videoId),
