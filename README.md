@@ -1,5 +1,5 @@
 # WeTube
-Chrome extension that adds social features to YouTube
+Chrome extension that adds a live chat to every YouTube video
 
 
 
