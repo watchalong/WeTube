@@ -1,9 +1,16 @@
 .sidebar {
-    
-  width: 250px;
-  height: 100%;
-  background-color: #f90404;
-  position: fixed;
+  color: #f1f1f1;
+  width: 400-18px;
+  height: 600px;
+  background-color: #0F0F0F;
   left: 0;
   top: 0;
+  border-radius: 10px;
+  padding: 8px;
+  margin-bottom: 30px;
+  font-size: 16px;
+  text-align: center;
+  border: #3F3F3F 1px solid;
+  font-family: Roboto, Arial, sans-serif;
+  font-weight: normal;
 }
