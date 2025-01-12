@@ -23,10 +23,12 @@ chatFrame.appendChild(chatMessagesWrapper);
 
 let chatInput = document.createElement('form');
 chatInput.className = 'sidebar';
-chatInput.style = "box-shadow: none; border-radius: 0 0 10px 10px; padding: 15px; border: none; border-top: rgb(63, 63, 63) 1px solid; margin: 0;";
+chatInput.style = "box-shadow: none; border-radius: 0 0 10px 10px; padding: 10px 24px; border: none; border-top: rgb(63, 63, 63) 1px solid; margin: 0; align-elements: left; text-align: left;";
 
 let chatTextBox = document.createElement('input');
 chatTextBox.type = 'text';
+chatTextBox.placeholder = 'Type a message...';
+chatTextBox.className = "textbox";
 chatInput.appendChild(chatTextBox);
 
 let chatSubmitButton = document.createElement('input');
