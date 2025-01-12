@@ -12,6 +12,19 @@ for (let script of document.scripts) {
   }
 }
 
+console
+
+chrome.runtime.sendMessage({
+  action: "setUser",
+  payload: {
+    userID: username,
+    data: {
+			video: window.location.href,
+		},
+  },
+}).then(r => {
+	console.log(response);
+});
 
 let partyChatContainer = document.createElement("div");
 
@@ -55,11 +68,7 @@ chatSubmitButton.style = "margin-left: 10px; vertical-align: middle;";
 chatInput.appendChild(chatSubmitButton);
 // Set a max height for the messages wrapper
 
-let observer = new MutationObserver(() => {
-    chatMessagesWrapper.scrollTop = chatMessagesWrapper.scrollHeight;
-});
-
-observer.observe(chatMessagesWrapper, { childList: true });
+// observer.observe(chatMessagesWrapper, { childList: true });
 function sendMessage(party, content) {
   console.log(`${party}: ${username}: ${content}`);
 
@@ -71,7 +80,7 @@ function sendMessage(party, content) {
     .then((response) => {
       console.log(response);
       let messages = response.data.messages || [];
-      messages.push(`${username},${content}`);  // comma-separated
+      messages.push(`${username},${content}`); // comma-separated
 
       chrome.runtime
         .sendMessage({
@@ -84,12 +93,15 @@ function sendMessage(party, content) {
     });
 }
 chatInput.onsubmit = function (e) {
-    e.preventDefault();
+  e.preventDefault(); // prevent form submission (no page refresh)
+  if (chatTextBox.value !== "") {
+    // prevent empty messages
     sendMessage("testParty1", chatTextBox.value);
     chatTextBox.value = "";
     setTimeout(() => {
         chatMessagesWrapper.scrollTop = chatMessagesWrapper.scrollHeight;
-    }, 500); // Adding a slight delay to ensure the message is added before scrolling
+    }, 500);
+  }
 };
 
 chatFrame.appendChild(chatInput);
@@ -97,6 +109,48 @@ chatFrame.appendChild(chatInput);
 initPartyChat();
 
 // get messages from firestore every 1 second
+let previousMessages = [];
+
+function updateMessages() {
+    chrome.runtime
+        .sendMessage({
+            action: "getParty",
+            payload: ["testParty1"],
+        })
+        .then((response) => {
+            let newMessages = response.data.messages || [];
+            if (JSON.stringify(newMessages) !== JSON.stringify(previousMessages)) {
+                let wasScrolledToBottom =
+                    chatMessagesWrapper.scrollHeight - chatMessagesWrapper.scrollTop ===
+                    chatMessagesWrapper.clientHeight;
+
+                chatMessagesWrapper.innerHTML = "";
+                newMessages.forEach((message) => {
+                    let messageElement = document.createElement("div");
+                    messageElement.className = "message";
+
+                    let firstSpaceIndex = message.indexOf(",");
+                    if (firstSpaceIndex !== -1) {
+                        let firstWord = message.substring(0, firstSpaceIndex);
+                        let restOfMessage = message.substring(firstSpaceIndex + 1);
+
+                        messageElement.innerHTML = `<strong style = "margin-right: 5px">${firstWord}</strong> ${restOfMessage}`;
+                    } else {
+                        messageElement.textContent = message;
+                    }
+                    chatMessagesWrapper.appendChild(messageElement);
+                });
+
+                if (wasScrolledToBottom) {
+                    chatMessagesWrapper.scrollTop = chatMessagesWrapper.scrollHeight;
+                }
+
+                previousMessages = newMessages;
+            }
+        });
+}
+
+setInterval(updateMessages, 1000);
 setInterval(() => {
   chrome.runtime
     .sendMessage({
@@ -104,25 +158,23 @@ setInterval(() => {
       payload: ["testParty1"],
     })
     .then((response) => {
-    //   chatMessagesWrapper.scrollTop = chatMessagesWrapper.scrollHeight;
       console.log(response);
       chatMessagesWrapper.innerHTML = "";
-    response.data.messages.forEach((message) => {
-      let messageElement = document.createElement("div");
-      messageElement.className = "message";
-      
-      let firstSpaceIndex = message.indexOf(',');
-      if (firstSpaceIndex !== -1) {
-        let firstWord = message.substring(0, firstSpaceIndex);
-        let restOfMessage = message.substring(firstSpaceIndex + 1);
-        
-        messageElement.innerHTML = `<strong>${firstWord}</strong> ${restOfMessage}`;
-      } else {
-        messageElement.textContent = message;
-      }
-      
-      chatMessagesWrapper.appendChild(messageElement);
-    });
+      response.data.messages.forEach((message) => {
+        let messageElement = document.createElement("div");
+        messageElement.className = "message";
+
+        let firstSpaceIndex = message.indexOf(",");
+        if (firstSpaceIndex !== -1) {
+          let firstWord = message.substring(0, firstSpaceIndex);
+          let restOfMessage = message.substring(firstSpaceIndex + 1);
+
+          messageElement.innerHTML = `<strong style = "margin-right: 5px">${firstWord}</strong> ${restOfMessage}`;
+        } else {
+          messageElement.textContent = message;
+        }
+        chatMessagesWrapper.appendChild(messageElement);
+      });
     });
 }, 1000);
 
@@ -133,4 +185,3 @@ async function initPartyChat() {
 
   ytSecondarySection.insertBefore(partyChatContainer, ytChatContainer);
 }
-// sleep(5000).then(() => { document.querySelector("#secondary-inner").insertBefore(x,document.querySelector("#chat-container")); });
