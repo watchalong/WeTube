@@ -220,7 +220,7 @@ function sendMessage(party, content) {
     })
     .then((response) => {
       let messages = response.data.messages || [];
-      messages.push(`${username},${content}`);  // comma-separated
+      messages.push(`${username},${content}`); // comma-separated
 
       chrome.runtime
         .sendMessage({
@@ -230,12 +230,15 @@ function sendMessage(party, content) {
     });
 }
 chatInput.onsubmit = function (e) {
-  e.preventDefault();
-  sendMessage("testParty1", chatTextBox.value);
-  chatTextBox.value = "";
-  setTimeout(() => {
-    chatMessagesWrapper.scrollTop = chatMessagesWrapper.scrollHeight;
-  }, 500); // Adding a slight delay to ensure the message is added before scrolling
+  e.preventDefault(); // prevent form submission (no page refresh)
+  if (chatTextBox.value !== "") {
+    // prevent empty messages
+    sendMessage("testParty1", chatTextBox.value);
+    chatTextBox.value = "";
+    setTimeout(() => {
+        chatMessagesWrapper.scrollTop = chatMessagesWrapper.scrollHeight;
+    }, 500);
+  }
 };
 
 chatFrame.appendChild(chatInput);
@@ -243,6 +246,48 @@ chatFrame.appendChild(chatInput);
 initPartyChat();
 
 // get messages from firestore every 1 second
+let previousMessages = [];
+
+function updateMessages() {
+    chrome.runtime
+        .sendMessage({
+            action: "getParty",
+            payload: ["testParty1"],
+        })
+        .then((response) => {
+            let newMessages = response.data.messages || [];
+            if (JSON.stringify(newMessages) !== JSON.stringify(previousMessages)) {
+                let wasScrolledToBottom =
+                    chatMessagesWrapper.scrollHeight - chatMessagesWrapper.scrollTop ===
+                    chatMessagesWrapper.clientHeight;
+
+                chatMessagesWrapper.innerHTML = "";
+                newMessages.forEach((message) => {
+                    let messageElement = document.createElement("div");
+                    messageElement.className = "message";
+
+                    let firstSpaceIndex = message.indexOf(",");
+                    if (firstSpaceIndex !== -1) {
+                        let firstWord = message.substring(0, firstSpaceIndex);
+                        let restOfMessage = message.substring(firstSpaceIndex + 1);
+
+                        messageElement.innerHTML = `<strong style = "margin-right: 5px">${firstWord}</strong> ${restOfMessage}`;
+                    } else {
+                        messageElement.textContent = message;
+                    }
+                    chatMessagesWrapper.appendChild(messageElement);
+                });
+
+                if (wasScrolledToBottom) {
+                    chatMessagesWrapper.scrollTop = chatMessagesWrapper.scrollHeight;
+                }
+
+                previousMessages = newMessages;
+            }
+        });
+}
+
+setInterval(updateMessages, 1000);
 setInterval(() => {
   chrome.runtime
     .sendMessage({
@@ -257,16 +302,15 @@ setInterval(() => {
         let messageElement = document.createElement("div");
         messageElement.className = "message";
 
-        let firstCommaIndex = message.indexOf(',');
+        let firstCommaIndex = message.indexOf(",");
         if (firstCommaIndex !== -1) {
           let firstWord = message.substring(0, firstCommaIndex);
           let restOfMessage = message.substring(firstCommaIndex + 1);
 
-          messageElement.innerHTML = `<strong>${firstWord}</strong> ${restOfMessage}`;
+          messageElement.innerHTML = `<strong style = "margin-right: 5px">${firstWord}</strong> ${restOfMessage}`;
         } else {
           messageElement.textContent = message;
         }
-
         chatMessagesWrapper.appendChild(messageElement);
       });
     });
@@ -279,4 +323,3 @@ async function initPartyChat() {
 
   ytSecondarySection.insertBefore(partyChatContainer, ytChatContainer);
 }
-// sleep(5000).then(() => { document.querySelector("#secondary-inner").insertBefore(x,document.querySelector("#chat-container")); });
